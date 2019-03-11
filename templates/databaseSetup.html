@@ -254,10 +254,21 @@
         </li>
 
 
-        <li>
-            <a href="{{ url_for('manageBankData') }}">
-          <span>Manage Bank Data</span>
+         <li class="treeview">
+          <a href="#">
+            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
           </a>
+          <ul class="treeview-menu">
+           <li><a href="{{ url_for('DatabaseSetup') }}"><i class="fa fa-circle-o"></i> Database Setup</a></li>
+            <li><a href="{{ url_for('manageBankData') }}"><i class="fa fa-circle-o"></i>business Rules Setup</a></li>
+
+          </ul>
+        </li>
+
+
         </li>
 
         <li>

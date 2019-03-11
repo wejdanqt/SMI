@@ -1,6 +1,8 @@
 from flask import Flask, redirect, render_template, request, session, abort, url_for
 from flaskext.mysql import MySQL
 import mysql.connector
+import configparser
+from sqlalchemy import create_engine
 import pyrebase
 
 
@@ -29,26 +31,42 @@ def connection2():
                                  autocommit=True)
     cur = db.cursor()
 
-    return cur, db
+    engine = create_engine("mysql+mysqlconnector://root:SMIhmwn19*@localhost/SMI_DB")
+
+    return cur, db, engine
 
 
-def BankConnection(host_name,user_name,password,db_name):
+def BankConnection():
 
     status=0
-    cur = ""
-    db = ""
+
+
+    config = configparser.ConfigParser()
+    config.read('credentials.ini')
+
+    cur, db, engine = connection2()
+
+
     try:
-        db = mysql.connector.connect(host=host_name,
-                                     user=user_name,
-                                     passwd=password,
-                                     db=db_name)
+        db = mysql.connector.connect(host=config['DB_credentials']['host'],
+                                     user=config['DB_credentials']['user'],
+                                     passwd=config['DB_credentials']['passwd'],
+                                     db=config['DB_credentials']['db'])
         cur = db.cursor()
+
+        engineParamter = 'mysql+mysqlconnector://' + config['DB_credentials']['user'] + ':' + config['DB_credentials']['passwd'] + '@' + config['DB_credentials']['host'] + '/' + config['DB_credentials']['db']
+        engine = create_engine(engineParamter)
 
     except Exception as e:
         status =1
+    return status, cur, db, engine
 
 
-    return status, cur , db
+
+
+
+
+
 
 def firebaseConnection():
     config = {
@@ -62,6 +80,3 @@ def firebaseConnection():
     }
 
     return pyrebase.initialize_app(config)
-
-
-

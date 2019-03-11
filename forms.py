@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField , FileField , SelectField , SelectMultipleField , validators
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField ,FileField , SelectField , SelectMultipleField , validators , HiddenField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
+#from flask_wtf.file import FileField
+
 
 
 
@@ -16,8 +18,10 @@ class ViewProfileForm(FlaskForm):
 
 
 
+
 class ViewCasesForm(FlaskForm):
-    submit = SubmitField('View Case')
+    case_submit = SubmitField('View Case')
+    hidden = HiddenField()
 
 
 class RegistrationForm(FlaskForm):
@@ -67,7 +71,7 @@ class oldCommentForm(FlaskForm):
 
 class newCommentForm(FlaskForm):
    commentBody = TextAreaField('Add Comment', validators=[DataRequired()], render_kw={"rows": 5, "cols": 11})
-   submit = SubmitField('Add Comment')
+   add_submit = SubmitField('Add Comment')
 
 
 class dbSetupForm(FlaskForm):
@@ -126,10 +130,10 @@ class manageBankDataForm(FlaskForm):
       ('Tunisia', 'Tunisia'), ('Turkey', 'Turkey'), ('Turkmenistan', 'Turkmenistan'), ('Turks and Caicos Islands', 'Turks and Caicos Islands'), ('Tuvalu', 'Tuvalu'), ('Uganda', 'Uganda'), ('Ukraine', 'Ukraine'), ('United Arab Emirates', 'United Arab Emirates'),
       ('United Kingdom', 'United Kingdom'), ('United States', 'United States'), ('United States Minor Outlying Islands', 'United States Minor Outlying Islands'), ('Uruguay', 'Uruguay'), ('Uzbekistan', 'Uzbekistan') , ('Vanuatu', 'Vanuatu'), ('Venezuela', 'Venezuela')
       , ('Viet Nam', 'Viet Nam'), ('Virgin Islands, British', 'Virgin Islands, British'), ('Virgin Islands, U.S.', 'Virgin Islands, U.S.'), ('Wallis and Futuna', 'Wallis and Futuna'), ('Western Sahara', 'Western Sahara') , ('Yemen', 'Yemen'), ('Zambia', 'Zambia'), ('Zimbabwe', 'Zimbabwe')])
-   exceed_avg_tran = IntegerField('Exceeding Average Transactions With:' )
+   exceed_avg_tran = IntegerField('Exceeding Average Transactions With:' , validators=[DataRequired()] )
    #type = SelectField('Type: ' , choices=[('Transfer', 'Transfer') , ('Cash out', 'Cash out')])
-   amount = IntegerField('Transaction Risk Amount:')
-   submit = SubmitField('submit')
+   amount = IntegerField('Transaction Risk Amount:' , validators=[DataRequired()])
+   bank_submit = SubmitField('submit')
 
 
 

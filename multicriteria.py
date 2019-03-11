@@ -12,24 +12,37 @@ db = firebase.database()
 
 
 
+ADestID = []
+ADestname = []
+Alocation = []
+Aamount = []
+Aavg = []
+
+status, cur , db = BankConnection()
+
+query = "SELECT clientID FROM SMI_DB.Client"
+cur.execute(query)
+record = list(set(list(cur.fetchall())))
+for column in record:
+    query2 = ("SELECT * FROM SMI_DB.transaction WHERE clientID = '%s'" % (column[0]))
+    cur.execute(query2)
+    record2 = cur.fetchall()
+    for column2 in record2:
+        ADestID.append(column2[6])  # list with client id
+        Aamount.append(column2[2])#amount
+        Aavg.append(column2[11])# AvgAmountOfTransaction
+        Alocation.append(column2[12])
+        ADestname.append(column2[13])  # list with names
+
+riskFlag = 0
+
+'''
+Reading dataset
+
 filtered_df = pd.read_csv('GeneratedDataset.csv', sep=",",header=0)
 nameDests = filtered_df['nameDest'].unique()
 
 filtered_df.head(2)
-
-
-
-
-
-
-
-
-'''
-
-
-Reading dataset
-
-
 
 
 Reading sanctions list
@@ -40,24 +53,24 @@ sanction_list = sanction_df[0].tolist()
 
 Reading High risk locations
 
+
 hrl_df = pd.read_csv('HighRiskLocation.csv', sep=",", header=None, engine='python')
 risk_locations = hrl_df[0].tolist()
-'''
+
 #risk_locations
 
-'''
+
     This method takes a client name  and it checks that name in sanction_list if it was in the sanction
     list it returns one which means rule1 is satisfied
 '''
-
-''' Business rules varibles'''
-
 
 
 risk_countries = db.child('Rule1').child('highRiskCountries').get().val()
 sanction_list = db.child('Rule4').child('blackList').get().val()
 exceed_avg_tran = db.child('Rule2').child('exceedingAvgTransaction').get().val()
 amount = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+
+
 
 
 
