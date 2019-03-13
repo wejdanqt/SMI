@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField ,FileField , SelectField , SelectMultipleField , validators , HiddenField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField ,FileField , SelectField , SelectMultipleField , validators , HiddenField , FloatField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 #from flask_wtf.file import FileField
 
@@ -34,6 +34,14 @@ class RegistrationForm(FlaskForm):
    submit = SubmitField('Register')
 
 
+class reportCase(FlaskForm):
+   reciver = StringField('To: ', validators= [DataRequired(), Email()])
+   subject = StringField('Sujbect: ', validators=[DataRequired()])
+   email_body = TextAreaField('Message: ', render_kw={"rows": 5, "cols": 11},validators=[DataRequired()])
+   #case_report = FileField('Upload Business Rules:1')
+   submit = SubmitField('Send')
+   #Report file:
+
 class LoginForm(FlaskForm):
    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
    password = PasswordField('Password', validators= [DataRequired()])
@@ -62,6 +70,7 @@ class clientForm(FlaskForm):
    clientClass = IntegerField('client class')
    clientID = IntegerField('Client ID')
    clientSalary = FloatField('Client Salary')
+
 
 
 class oldCommentForm(FlaskForm):
@@ -130,9 +139,9 @@ class manageBankDataForm(FlaskForm):
       ('Tunisia', 'Tunisia'), ('Turkey', 'Turkey'), ('Turkmenistan', 'Turkmenistan'), ('Turks and Caicos Islands', 'Turks and Caicos Islands'), ('Tuvalu', 'Tuvalu'), ('Uganda', 'Uganda'), ('Ukraine', 'Ukraine'), ('United Arab Emirates', 'United Arab Emirates'),
       ('United Kingdom', 'United Kingdom'), ('United States', 'United States'), ('United States Minor Outlying Islands', 'United States Minor Outlying Islands'), ('Uruguay', 'Uruguay'), ('Uzbekistan', 'Uzbekistan') , ('Vanuatu', 'Vanuatu'), ('Venezuela', 'Venezuela')
       , ('Viet Nam', 'Viet Nam'), ('Virgin Islands, British', 'Virgin Islands, British'), ('Virgin Islands, U.S.', 'Virgin Islands, U.S.'), ('Wallis and Futuna', 'Wallis and Futuna'), ('Western Sahara', 'Western Sahara') , ('Yemen', 'Yemen'), ('Zambia', 'Zambia'), ('Zimbabwe', 'Zimbabwe')])
-   exceed_avg_tran = IntegerField('Exceeding Average Transactions With:' , validators=[DataRequired()] )
+   exceed_avg_tran = FloatField('Exceeding Average Transactions With:' , validators=[DataRequired()] )
    #type = SelectField('Type: ' , choices=[('Transfer', 'Transfer') , ('Cash out', 'Cash out')])
-   amount = IntegerField('Transaction Risk Amount:' , validators=[DataRequired()])
+   amount = FloatField('Transaction Risk Amount:' , validators=[DataRequired()])
    bank_submit = SubmitField('submit')
 
 

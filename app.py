@@ -1,6 +1,6 @@
 from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response
 from flaskext.mysql import MySQL
-from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm , SearchForm , ViewProfileForm , ViewCasesForm
+from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm , SearchForm , ViewProfileForm , ViewCasesForm , reportCase
 from DBconnection import connection2, BankConnection , firebaseConnection
 from passwordRecovery import passwordRecovery
 from datetime import datetime
@@ -16,6 +16,7 @@ import time
 from celery import Celery
 from MachineLearningLayer.Detect import Detection
 import pdfkit
+from flask_mail import Mail, Message
 
 
 
@@ -47,6 +48,10 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
 conn = mysql.connect()
 cursor = conn.cursor()
 
+# Initialize extensions
+mail = Mail(app)
+
+
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
@@ -71,23 +76,6 @@ def login():
 
         # Check id user exisit in the database
         cur, db , engine = connection2()
-        '''query = "SELECT * FROM AMLOfficer WHERE userName = '" + form.username.data + "' AND password = '" + form.password.data + "' "
-        cur.execute(query)
-        data1 = cur.fetchone()
-        if data1 is None:
-            flash('Invalid username or password please try again', 'danger')
-            return render_template('login.html', form=form)
-        else:
-            query = "SELECT email FROM AMLOfficer WHERE userName = '" + form.username.data + "'"
-            cur.execute(query)
-            useremail = cur.fetchone()
-            session["username"] = form.username.data
-            session["email"] = useremail
-            flash(f'Welcome back {form.username.data}', 'success')
-            return redirect(url_for('bankP'))
-        db.commit()
-        cur.close()
-        db.close()'''
         cur.execute("SELECT COUNT(1) FROM AMLOfficer WHERE userName = %s;", [form.username.data])  # CHECKS IF USERNAME EXSIST
         if cur.fetchone()[0]:
             cur.execute("SELECT password FROM AMLOfficer WHERE userName = %s;", [form.username.data])  # FETCH THE HASHED PASSWORD
@@ -149,13 +137,13 @@ def register():
         if not (data1 is None):
             flash('This Username is already registered please try another username', 'danger')
             return render_template('Register.html', form=form)
-        elif not (data2 is None):
+        if not (data2 is None):
             flash('This Email is already registered please try another email', 'danger')
             return render_template('Register.html', form=form)
         else:
             cur, db , engine = connection2()
-            query = "INSERT INTO AMLOfficer (userName, email, fullname, password, bank_id ) VALUES(%s,%s,%s,%s,%s)"
-            val = (form.username.data, form.email.data, form.fullName.data, form.password.data, 1)
+            query = "INSERT INTO AMLOfficer (userName, email, fullname, password) VALUES(%s,%s,%s,%s)"
+            val = (form.username.data, form.email.data, form.fullName.data, form.password.data)
             cur.execute(query, val)
             db.commit()
             cur.close()
@@ -315,6 +303,17 @@ def manageProfile():
     return render_template("ManageProfile.html", form=form , form2 = search_form )
 
 
+@app.route('/deleteProfile', methods=['GET','POST'])
+def deleteProfile():
+    username = session.get('username')
+    cur, db, engine = connection2()
+    query = "DELETE FROM Comment WHERE officerName = '" + username + "'"
+    cur.execute(query)
+
+    query = "DELETE FROM AMLOfficer WHERE userName = '" + username + "'"
+    cur.execute(query)
+    return redirect(url_for('home'))
+
 
 @app.route("/ManageBankData" , methods=['GET', 'POST'])
 def manageBankData():
@@ -329,7 +328,6 @@ def manageBankData():
         print(target)
         if not os.path.isdir(target):
             os.mkdir(target)
-
         file  =  request.files.get('file_br')
         print(file)
         filename = file.filename
@@ -429,17 +427,33 @@ def cases():
 @app.route("/case/<id>", methods=['GET', 'POST'])
 def case(id):
     # Only logged in users can access bank profile
-    search_form = SearchForm()
 
-    print(type(id))
     if session.get('username') == None:
         return redirect(url_for('home'))
+    search_form = SearchForm()
 
     if search_form.search_submit.data and search_form.validate_on_submit():
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
 
-    return render_template("case.html" , form2 = search_form )
+    cur, db, engine = connection2()
+    cur.execute("SELECT * FROM SMI_DB.ClientCase WHERE caseID=%s " % (id))
+    data = cur.fetchall()
+    client_ID = data[0][3]
+    profileLabel=''
+    if data[0][1] == 'Low':#Need to change it Meduim
+        profileLabel ='label label-warning'
+    else:#High
+        profileLabel = 'label label-danger'
+
+    cur.execute("SELECT * FROM SMI_DB.Client WHERE clientID=%s " % ( client_ID))
+    data2 = cur.fetchall()
+
+    cur.execute("SELECT * FROM SuspiciousTransaction WHERE clientID=%s " % (client_ID))
+    transaction = cur.fetchall()
+
+    return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = id, transaction=transaction)
+
 
 @app.route('/download/<id>', methods=['GET','POST'])
 def download(id):
@@ -447,42 +461,65 @@ def download(id):
     query = "SELECT * FROM SMI_DB.ClientCase WHERE caseID = '" + id + "'"
     cur.execute(query)
     record = cur.fetchall()
-
-    caseID = ''
+    client_ID = record[0][3]
+    caseNumber = ''
     caseDate = ''
-    ClientID = ''
-    amount = ''
 
-    for column in record:
-        caseID = column[0]  # caseID
-        caseDate = column[2]  # caseDate
-        ClientID = column[3]
+    for each1 in record:
+        caseNumber = each1[0]
+        caseDate = each1[2]
 
 
-    query1 = "SELECT * FROM SMI_DB.ClientCase WHERE caseID = '" + id + "'"
+
+
+    profileLabel = ''
+    if record[0][1] == 'Low':  # Need to change it Meduim
+        profileLabel = 'label label-warning'
+    else:  # High
+        profileLabel = 'label label-danger'
+    label_name = record[0][1]
+
+
+
+
+    #--------------------#----------------------#--------------------------#-------------#
+
+    query1 = "SELECT * FROM SMI_DB.SuspiciousTransaction WHERE clientID=%s " % (client_ID)
     cur.execute(query1)
     record1 = cur.fetchall()
+    transaction_number = ''
+    transaction_type = ''
+    transaction_amount = ''
+    transaction_location = ''
+    old_balance = ''
+    new_balance = ''
 
 
+    for each in record1:
+        transaction_number = each[15]
+        transaction_type = each[1]
+        transaction_amount = each[2]
+        transaction_location = each[13]
+        old_balance = each[7]
+        new_balance = each[8]
+
+    query2 = "SELECT * FROM SMI_DB.Client WHERE clientID=%s " % (client_ID)
+    cur.execute(query2)
+    record2 = cur.fetchall()
+    clientName = ''
+    for each in record2:
+     clientName = each[1]
 
 
-
-
-
-
-
-
-
-
-
-    rendered = render_template('case_template.html', caseID = caseID, caseDate = caseDate , ClientID = ClientID)
+    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber ,caseDate = caseDate,label = profileLabel ,label_name = label_name ,transaction_number = transaction_number ,
+    transaction_type = transaction_type , transaction_amount= transaction_amount , transaction_location = transaction_location ,
+                               old_balance = old_balance , new_balance = new_balance)
 
     pdf = pdfkit.from_string(rendered, False)
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=output.pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=case.pdf'
     return response
-
 
 '''@app.route("/addComment")
 def comment():
@@ -493,22 +530,39 @@ def comment():
 @app.route("/DatabaseSetup", methods=['GET', 'POST'])
 def DatabaseSetup():
     # Only logged in users can access bank profile
-
-
-    #Those two lines makes the system slow because the firebase connection
-
-    db = firebase.database()
-    amount = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
-
     if session.get('username') == None:
         return redirect(url_for('home'))
     form = dbSetupForm()
-    if form.validate_on_submit():
+    form2 = SearchForm()
+    status, cur, db, engine = BankConnection()
+    db = firebase.database()
+    isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+    if status == 0: #If DB is already set bring the form.
+        config = configparser.ConfigParser()
+        config.read('credentials.ini')
+        form.db_host.data = config['DB_credentials']['host']
+        form.db_name.data = config['DB_credentials']['db']
+        form.db_pass.data = config['DB_credentials']['passwd']
+        form.db_user.data = config['DB_credentials']['user']
 
-        if amount == 'false':
-            flash(Markup(
-                'You didn''t setup you''r business rules, please click <a href="/manageBankData" class="alert-link">here</a> to setup '),
-                'danger')
+
+
+    if form2.search_submit.data and form2.validate_on_submit():
+        return redirect((url_for('searchResult', id=form2.search.data, form2=form2)))
+
+
+    if form.validate_on_submit():
+        if status == 0: # If the user tried to connect to already connected DB
+            config = configparser.ConfigParser()
+            config.read('credentials.ini')
+
+            if form.db_host.data==config['DB_credentials']['host']\
+                    and form.db_name.data == config['DB_credentials']['db']\
+                    and form.db_pass.data == config['DB_credentials']['passwd']\
+                    and form.db_user.data == config['DB_credentials']['user']:
+
+                flash('You are already connected to this database..', 'success')
+                return render_template("databaseSetup.html", form=form ,form2=form2 )
 
         config = configparser.ConfigParser()
         config['DB_credentials'] = {'host': form.db_host.data,
@@ -517,25 +571,47 @@ def DatabaseSetup():
                                      'db': form.db_name.data}
         with open('credentials.ini', 'w') as configfile:
             config.write(configfile)
-        status, cur, db , engine = BankConnection()
+        status, cur, db, engine= BankConnection()
         if status == 1:
             flash('Unable to connect please try again..', 'danger')
-            return render_template("databaseSetup.html", form=form)
+            return render_template("databaseSetup.html", form=form , form2=form2)
         else:
+            if isFB_Connected != 'false':
+                flash('Successfully connected to the database..Upload your business rules to start the analysis', 'success')
+                search_form = SearchForm()
+                form = manageBankDataForm()
+                return render_template("ManageBankData.html", form=form, form2=form2)
+
             # Check if bussinse rule is uploaded
             flash('Successfully connected to the database..', 'success')
-            return render_template("databaseSetup.html", form=form)
-    return render_template("databaseSetup.html", form = form)
+            return render_template("databaseSetup.html", form=form , form2=form2)
 
-@app.route("/Report", methods=['GET', 'POST'])
-def Report():
+    return render_template("databaseSetup.html", form = form , form2=form2)
+
+
+
+@app.route("/Report/<id>", methods=['GET', 'POST'])
+def Report(id):
     # Only logged in users can access bank profile
     if session.get('username') == None:
         return redirect(url_for('home'))
 
+    form = reportCase()
+    print('Inside Report')
+    print(form.reciver.data)
+    if form.validate_on_submit():
+        #print('Calling sendReport')
+        #return redirect((url_for('sendReport', form=form)))
+        print('Inside sendReport')
+        print(form.reciver.data)
+        recipient = form.reciver.data
+        msg = Message(form.subject.data, recipient.split())
+        msg.body = form.email_body.data
+        print(msg)
+        mail.send(msg)
 
-    return render_template("email.html")
-
+        flash('Email has been sent Successfully..', 'success')
+    return render_template("email.html", form = form, clientID= id)
 
 @celery.task(bind=True)
 def long_task(self):
@@ -591,8 +667,6 @@ def taskstatus(task_id):
 
 @app.route("/testTemp")
 def testTemp():
-
-
     return render_template("bankProfile.html", form = form)
 
 if __name__ == "__main__":
