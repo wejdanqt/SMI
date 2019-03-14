@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response
+from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response , render_template_string
 from flaskext.mysql import MySQL
 from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm , SearchForm , ViewProfileForm , ViewCasesForm , reportCase
 from DBconnection import connection2, BankConnection , firebaseConnection
@@ -13,10 +13,13 @@ from flask_sqlalchemy import SQLAlchemy
 import pyrebase
 import random
 import time
-from celery import Celery
+from celery import Celery , task
 from MachineLearningLayer.Detect import Detection
 import pdfkit
 from flask_mail import Mail, Message
+from celery.result import AsyncResult
+import json
+
 
 
 
@@ -61,9 +64,6 @@ firebase = firebaseConnection()
 #....................
 
 
-
-
-
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -105,13 +105,12 @@ def login():
                             cur.execute("UPDATE SMI_DB.AMLOfficer SET numOfFailedLogin= numOfFailedLogin+1 WHERE userName='%s' " % (form.username.data))  # SUCCESSFUL LOGIN SET #ofTries to zero
                             db.commit()
                             flash('Wrong Password try again!', 'danger')
-
         else:
             flash('Invalid Username try again!', 'danger')
             db.commit()
             cur.close()
             db.close()
-    task = long_task.apply_async()
+    #task = long_task.apply_async()
     return render_template('login.html', form=form)
 
 
@@ -180,13 +179,32 @@ def forgotPass():
 
 @app.route("/bankProfile" , methods=['GET', 'POST'])
 def bankP():
-
     if session.get('username') == None:
         return redirect(url_for('home'))
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
     form = SearchForm()
     if form.validate_on_submit():
         return redirect((url_for('searchResult', id= form.search.data)))  # or what you want
-    return render_template("bankProfile.html", form = form)
+    return render_template("bankProfile.html", form = form, alert = totalAlert)
+
+
+
+def alert():
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase "
+    cur.execute(query)
+    total = cur.fetchall()
+    total1 = len(total)
+    print(total1)
+    return total1
+
+
+
 
 
 
@@ -212,9 +230,6 @@ def searchResult(id):
 
         return render_template("searchResult.html", data=data, form=form , form2 = search_form)
 
-
-def isset(variable):
-	return variable in locals() or variable in globals()
 
 
 @app.route("/clientProfile/<id>", methods=['GET', 'POST'])
@@ -280,7 +295,6 @@ def clientProfile(id):
 
 
         return render_template("clientProfile.html", clientForm = client_form, commentForm = new_comment , record = record , oldCommentForm=old_comment)
-
 
 
 
@@ -382,12 +396,11 @@ def cases():
         search = True
 
 
-    cur, db , engine = connection2()
     # Only logged in users can access bank profile
     if session.get('username') == None:
         return redirect(url_for('home'))
     else:
-
+        cur, db, engine = connection2()
         form = ViewCasesForm()
         search_form = SearchForm()
         per_page = 4
@@ -420,7 +433,7 @@ def cases():
         # e.g. Pagination(per_page_parameter='pp')
         #, pagination=pagination
 
-        return render_template("cases.html", cases = cases, form=form , form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0)
+        return render_template("cases.html", cases = cases, form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0)
 
 #case page
 
@@ -432,14 +445,22 @@ def case(id):
         return redirect(url_for('home'))
     search_form = SearchForm()
 
+
     if search_form.search_submit.data and search_form.validate_on_submit():
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
+
+
+
+    cur, db, engine = connection2()
+    cur.execute("UPDATE ClientCase SET viewed = '0' WHERE caseID=%s " % (id))
+
 
 
     cur, db, engine = connection2()
     cur.execute("SELECT * FROM SMI_DB.ClientCase WHERE caseID=%s " % (id))
     data = cur.fetchall()
     client_ID = data[0][3]
+
     profileLabel=''
     if data[0][1] == 'Low':#Need to change it Meduim
         profileLabel ='label label-warning'
@@ -468,7 +489,6 @@ def download(id):
     for each1 in record:
         caseNumber = each1[0]
         caseDate = each1[2]
-
 
 
 
@@ -502,6 +522,8 @@ def download(id):
         transaction_location = each[13]
         old_balance = each[7]
         new_balance = each[8]
+
+    # --------------------#----------------------#--------------------------#-------------#
 
     query2 = "SELECT * FROM SMI_DB.Client WHERE clientID=%s " % (client_ID)
     cur.execute(query2)
@@ -613,61 +635,50 @@ def Report(id):
         flash('Email has been sent Successfully..', 'success')
     return render_template("email.html", form = form, clientID= id)
 
-@celery.task(bind=True)
-def long_task(self):
-    D = Detection()
-    D.Detect()
-    """Background task that runs a long function with progress reports."""
-    verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
-    adjective = ['master', 'radiant', 'silent', 'harmonic', 'fast']
-    noun = ['solar array', 'particle reshaper', 'cosmic ray', 'orbiter', 'bit']
-    message = ''
-    total = random.randint(10, 50)
-    for i in range(total):
-        if not message or random.random() < 0.25:
-            message = '{0} {1} {2}...'.format(random.choice(verb),
-                                              random.choice(adjective),
-                                              random.choice(noun))
-        self.update_state(state='PROGRESS',
-                          meta={'current': i, 'total': total,
-                                'status': message})
-        time.sleep(1)
-    return {'current': 100, 'total': 100, 'status': 'Task completed!',
-            'result': 42}
 
-@app.route('/status/<task_id>')
-def taskstatus(task_id):
-    task = long_task.AsyncResult(task_id)
-    if task.state == 'PENDING':
-        # job did not start yet
-        response = {
-            'state': task.state,
-            'current': 0,
-            'total': 1,
-            'status': 'Pending...'
-        }
-    elif task.state != 'FAILURE':
-        response = {
-            'state': task.state,
-            'current': task.info.get('current', 0),
-            'total': task.info.get('total', 1),
-            'status': task.info.get('status', '')
-        }
-        if 'result' in task.info:
-            response['result'] = task.info['result']
-    else:
-        # something went wrong in the background job
-        response = {
-            'state': task.state,
-            'current': 1,
-            'total': 1,
-            'status': str(task.info),  # this is the exception raised
-        }
-    return jsonify(response)
+######CELERY PART #########
+@app.route('/startAnalysis')
+def startAnalysis():
+    return render_template_string('''<a href="{{ url_for('enqueue') }}">start</a>''')
 
-@app.route("/testTemp")
-def testTemp():
-    return render_template("bankProfile.html", form = form)
+@app.route('/enqueue')
+def enqueue():
+    task = Analysis.delay()
+    form2 = SearchForm()
+    return render_template('analysisView.html', JOBID=task.id, form2=form2)
+
+
+@app.route('/analysisView')
+def analysisView():
+    form2 =SearchForm()
+    return render_template("analysisView.html",form2= form2)
+
+
+@app.route('/progress')
+def progress():
+    jobid = request.values.get('jobid')
+    if jobid:
+        # GOTCHA: if you don't pass app=celery here,
+        # you get "NotImplementedError: No result backend configured"
+        job = AsyncResult(jobid, app=celery)
+        print (job.state)
+        print (job.result)
+        if job.state == 'PROGRESS':
+            return json.dumps(dict(
+                state=job.state,
+                progress=job.result['current']*1.0/job.result['total'],
+            ))
+        elif job.state == 'SUCCESS':
+            return json.dumps(dict(
+                state=job.state,
+                progress=1.0,
+            ))
+    return '{}'
+
+@celery.task
+def Analysis():
+    d = Detection()
+    d.Detect()
 
 if __name__ == "__main__":
     app.run(debug =True)
