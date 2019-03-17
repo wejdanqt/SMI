@@ -194,20 +194,6 @@ def bankP():
 
 
 
-def alert():
-    cur, db, engine = connection2()
-    query = "SELECT * FROM SMI_DB.ClientCase "
-    cur.execute(query)
-    total = cur.fetchall()
-    total1 = len(total)
-    print(total1)
-    return total1
-
-
-
-
-
-
 @app.route("/searchResult/<id>" , methods=['GET', 'POST'])
 def searchResult(id):
 
@@ -637,6 +623,7 @@ def Report(id):
 
 
 ######CELERY PART #########
+
 @app.route('/startAnalysis')
 def startAnalysis():
     return render_template_string('''<a href="{{ url_for('enqueue') }}">start</a>''')

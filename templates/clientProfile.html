@@ -2,15 +2,25 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-#more {display: none;}
-</style>
+
 
     <style>
         .ScrollStyle
 {
-    max-height:180px;
-    overflow-y: scroll;
+    max-height:300px;
+    overflow-y:scroll;
+
+
+}
+
+        ::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
     </style>
@@ -258,7 +268,7 @@
      </form>
 
 
-            <form action="" method="post">
+            <form action="" method="post" class="read-more">
             {{ oldCommentForm.hidden_tag() }}
 
             <div class="ScrollStyle">
@@ -280,6 +290,9 @@
 
 
             </form>
+
+
+
 
           <form action="" method="post">
           {{ commentForm.hidden_tag() }}
@@ -339,6 +352,14 @@
 
 
 <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
+
+      <script src="{{ url_for('static', filename='readmore.js') }}"></script>
+
+
+
+
+
+
 
   </div>
 </div>
