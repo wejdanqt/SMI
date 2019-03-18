@@ -133,6 +133,7 @@ def register():
         # Checking If the account(email) is already registered.
         cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
         data2 = cursor.fetchone()
+
         if not (data1 is None):
             flash('This Username is already registered please try another username', 'danger')
             return render_template('Register.html', form=form)
@@ -292,10 +293,28 @@ def manageProfile():
     if session.get('username') == None:
         return redirect(url_for('home'))
 
+
     if form.profile_submit.data and form.validate_on_submit():
-        cur, db , engine = connection2()
-        cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' , userName = '" + form.username.data + "', password = '" + form.password.data + "' WHERE userName = '" + username + "'" )
-        db.commit()
+        cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
+        data2 = cursor.fetchone()
+        if not (data2 is None):
+            flash('This Email is already exists please try another email', 'danger')
+            return render_template('ManageProfile.html', form=form , form2 = search_form )
+        else:
+            cur, db , engine = connection2()
+            cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' , password = '" + form.password.data + "' WHERE userName = '" + username + "'" )
+            db.commit()
+
+    # bring info from database
+    cur1, db1, engine1 = connection2()
+    cur1.execute("SELECT * FROM SMI_DB.AMLOfficer WHERE userName = '" + username + "'")
+    data = cur1.fetchall()
+
+
+    for each in data:
+        form.fullName.data = each[2]
+        form.email.data = each[1]
+
 
     if search_form.search_submit.data and search_form.validate_on_submit():
         return redirect((url_for('searchResult', id= search_form.search.data , form2 = search_form )))
@@ -320,7 +339,7 @@ def manageBankData():
     form = manageBankDataForm()
     search_form = SearchForm()
     status, cur, db, engine = BankConnection()
-    if  form.bank_submit.data and form.validate_on_submit():
+    if  form.validate_on_submit():
         ## check if there's prevoius BR and confirm to update it
 
         print()
@@ -492,22 +511,8 @@ def download(id):
 
     query1 = "SELECT * FROM SMI_DB.SuspiciousTransaction WHERE clientID=%s " % (client_ID)
     cur.execute(query1)
-    record1 = cur.fetchall()
-    transaction_number = ''
-    transaction_type = ''
-    transaction_amount = ''
-    transaction_location = ''
-    old_balance = ''
-    new_balance = ''
+    transaction = cur.fetchall()
 
-
-    for each in record1:
-        transaction_number = each[15]
-        transaction_type = each[1]
-        transaction_amount = each[2]
-        transaction_location = each[13]
-        old_balance = each[7]
-        new_balance = each[8]
 
     # --------------------#----------------------#--------------------------#-------------#
 
@@ -519,9 +524,7 @@ def download(id):
      clientName = each[1]
 
 
-    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber ,caseDate = caseDate,label = profileLabel ,label_name = label_name ,transaction_number = transaction_number ,
-    transaction_type = transaction_type , transaction_amount= transaction_amount , transaction_location = transaction_location ,
-                               old_balance = old_balance , new_balance = new_balance)
+    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber ,caseDate = caseDate,label = profileLabel ,label_name = label_name , transaction = transaction)
 
     pdf = pdfkit.from_string(rendered, False)
     response = make_response(pdf)
@@ -545,13 +548,6 @@ def DatabaseSetup():
     status, cur, db, engine = BankConnection()
     db = firebase.database()
     isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
-    if status == 0: #If DB is already set bring the form.
-        config = configparser.ConfigParser()
-        config.read('credentials.ini')
-        form.db_host.data = config['DB_credentials']['host']
-        form.db_name.data = config['DB_credentials']['db']
-        form.db_pass.data = config['DB_credentials']['passwd']
-        form.db_user.data = config['DB_credentials']['user']
 
 
 
@@ -593,6 +589,17 @@ def DatabaseSetup():
             # Check if bussinse rule is uploaded
             flash('Successfully connected to the database..', 'success')
             return render_template("databaseSetup.html", form=form , form2=form2)
+
+
+
+    if status == 0: #If DB is already set bring the form.
+        config = configparser.ConfigParser()
+        config.read('credentials.ini')
+        form.db_host.data = config['DB_credentials']['host']
+        form.db_name.data = config['DB_credentials']['db']
+        form.db_pass.data = config['DB_credentials']['passwd']
+        form.db_user.data = config['DB_credentials']['user']
+
 
     return render_template("databaseSetup.html", form = form , form2=form2)
 

@@ -244,7 +244,7 @@
             <!-- form start -->
 </br>
 
-            <form  action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+            <form  onsubmit="return confirm('Do you really want to submit the form?');" action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
               <div class="box-body">
               <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Use Template &ensp; &ensp; &ensp;
@@ -323,23 +323,20 @@
                       {{ form.amount.label(class="col-md-3 control-label" ) }}
                    <div class="col-md-3">
 
-                       {{ form.amount}}
+                       {{ form.amount }}
+
+
                     </div>
                       </div>
                     <hr>
                         <div style="width:40%; margin-left:28%;">
                          {{ form.bank_submit(class="btn btn-primary btn-block btn-flat" )}}
+
                         </div>
                    </div>
               </div>
               <!-- /.box-body -->
             </form>
-
-                <script>
-function myFunction() {
-  confirm("Press a button!");
-}
-</script>
 
             <script>
             function show1(){
