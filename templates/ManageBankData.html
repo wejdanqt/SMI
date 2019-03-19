@@ -45,8 +45,10 @@
     <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
       <!-- mini logo for sidebar mini 50x50 pixels -->
 
+   <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
+
       <!-- logo for regular state and mobile devices -->
-           <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
+      <span class="logo-lg">  <img  height="42" width="130" src="{{url_for('static', filename='dist/img/newlogo.png')}}"alt="User Image"></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -90,11 +92,13 @@
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img  src="{{url_for('static', filename='dist/img/Riyadh1.png')}}" class="user-image" alt="User Image">
                  <span class="hidden-xs">{{ session['username'] }}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
+                <img src="{{url_for('static', filename='dist/img/Riyadh1.png')}}" class="img-circle" alt="User Image">
 
                 <p>
                   {{ session['username'] }}
@@ -124,19 +128,31 @@
 
 
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-   <aside class="main-sidebar">
+    <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
+      <div class="user-panel">
+        <div class="pull-left image">
+            <img src="{{url_for('static', filename='dist/img/Riyadh.png')}}" class="img-circle" alt="User Image">
+
+        </div>
+        <div class="pull-left info">
+          <p>{{ session['username'] }}</p>
+          <a href="#"> <i class="fa fa-circle text-success"></i> Logged in</a>
+        </div>
+      </div>
+
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
-              </a>
-                <!-- search form -->
-              <form action="#" method="post" class="sidebar-form" role="form">
+          <a href="#">
+            <a><i class="fa fa-search"></i> <span>Search For Client</span></a>
+
+     <!-- search form -->
+              <form action="" method="post" class="sidebar-form" role="form">
                    {{ form2.hidden_tag() }}
               <div class="input-group">
                    {{ form2.search( class="form-control")  }}
@@ -147,6 +163,7 @@
               </div>
             </form>
 
+          </a>
         </li>
 
 
@@ -157,20 +174,6 @@
           </a>
         </li>
 
-
-             <li class="treeview">
-          <a href="#">
-            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-           <li><a href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
-            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
-
-          </ul>
-        </li>
         <li>
           <a href="{{ url_for('manageProfile') }}">
           <span>Manage Profile</span>
@@ -178,7 +181,21 @@
         </li>
 
 
-          <li>
+           <li class="treeview">
+          <a href="#">
+            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+           <li><a href="{{ url_for('DatabaseSetup') }}"><i class="fa fa-circle-o"></i> Database Setup</a></li>
+            <li><a href="{{ url_for('manageBankData') }}"><i class="fa fa-circle-o"></i>business Rules Setup</a></li>
+
+          </ul>
+        </li>
+
+        <li>
            <a href="{{ url_for('cases') }}">
           <span>View Cases</span>
             <span class="pull-right-container">
@@ -200,7 +217,7 @@
 
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
+                <div class="alert alert-{{ category }}"  style="font-size:125%;">
                 {{ message }}
                 </div>
 
@@ -210,10 +227,7 @@
     {% endwith %}
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>
-        Manage Bank Data
 
-      </h1>
       <ol class="breadcrumb">
         <li><a href="{{ url_for('home') }}"><i class="fa fa-home"></i> Home</a></li>
           <li><a href="{{ url_for('bankP') }}">Profile</a></li>
@@ -244,32 +258,36 @@
             <!-- form start -->
 </br>
 
-            <form  onsubmit="return confirm('Do you really want to submit the form?');" action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+            <form  action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data"
+            {% if not(isFB_Connected == 'flase') %}
+                onsubmit="return confirm('Are you sure you want to update your old Business Rules connection?')"
+            {% endif %}>
                     {{ form.hidden_tag() }}
               <div class="box-body">
-              <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Use Template &ensp; &ensp; &ensp;
-                  <input type="radio" name="tab" value="igottwo" onclick="show2();" /> Upload Business Rules
+              <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Upload Business Rules &ensp; &ensp; &ensp;
+                  <input type="radio" name="tab" value="igottwo" onclick="show2();" /> Business Rules Sample
                   <hr>
 
-                 <!-- Upload Business Rules code -->
+                 <!-- Business Rules Sample -->
                 <div  id="div1" style="display: none" >
                    <div class="form-group">
-                        {{ form.businessRules_file.label(class="col-md-3 control-label") }}
+
+                       <h4 class="col-md-3 control-label">Rule#1:</h4>
                    <div class="col-md-8">
                        <!-- Select input form -->
-                       {{ form.businessRules_file }}
+
                    <!--  <input type="file" id="exampleInputFile"  > -->
-                  <p class="help-block">file extention, .txt</p>
+
                     </div>
                       </div>
-                  <button class="btn btn-default" value="Delete" style="margin-left:85%; width:10%; tect-align:center;" >Delete</button>
+
 
                 </br>
                     <hr>
-                      <Button class="btn btn-default" value="Submit" style="margin-left:42%; width:20%; tect-align:center;">Submit</button>
+
                 </div>
 
-                   <!-- Template code -->
+                   <!-- Upload Business Rules -->
                    <div  style="display: none" id="div2">
                        <!-- For inserting black list names -->
                     <div class="form-group">
@@ -299,9 +317,7 @@
 
 
                             <script>
-
                                 document.multiselect('#testSelect1');
-
                             </script>
                             <!-- ..................... -->
                     </div>
@@ -323,20 +339,23 @@
                       {{ form.amount.label(class="col-md-3 control-label" ) }}
                    <div class="col-md-3">
 
-                       {{ form.amount }}
-
-
+                       {{ form.amount}}
                     </div>
                       </div>
                     <hr>
                         <div style="width:40%; margin-left:28%;">
                          {{ form.bank_submit(class="btn btn-primary btn-block btn-flat" )}}
-
                         </div>
                    </div>
               </div>
               <!-- /.box-body -->
             </form>
+
+                <script>
+function myFunction() {
+  confirm("Press a button!");
+}
+</script>
 
             <script>
             function show1(){
@@ -394,10 +413,6 @@
 
 
 <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
-
-
-
-
 
 </body>
 </html>

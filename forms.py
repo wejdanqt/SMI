@@ -96,8 +96,8 @@ class dbSetupForm(FlaskForm):
 
 class manageBankDataForm(FlaskForm):
    businessRules_file = FileField('Upload Business Rules:' )
-   sanction_list = FileField('Upload Sanction List:' ,  validators=[FileRequired()] )
-   risk_countries = SelectMultipleField('High Risk Countries:', validators= [DataRequired("Please choose a Countery")],choices=[('Afghanistan', 'Afghanistan') , ('Åland Islands', 'Åland Islands') ,
+   sanction_list = FileField('Upload Sanction List:' )
+   risk_countries = SelectMultipleField('High Risk Countries:', choices=[('Afghanistan', 'Afghanistan') , ('Åland Islands', 'Åland Islands') ,
     ('Albania', 'Albania'), ('Algeria', 'Algeria') , ('American', 'American') , ('Andorra', 'Andorra') , ('Angola', 'Angola') , ('Anguilla', 'Anguilla')
      , ('Antarctica', 'Antarctica') , ('Antigua and Barbuda', 'Antigua and Barbuda') , ('Argentina', 'Argentina') , ('Armenia', 'Armenia')
       , ('Austria', 'Austria') , ('Azerbaijan', 'Azerbaijan'), ('Bahamas', 'Bahamas'), ('Bahrain', 'Bahrain'), ('Bangladesh', 'Bangladesh')

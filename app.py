@@ -336,57 +336,71 @@ def deleteProfile():
 
 @app.route("/ManageBankData" , methods=['GET', 'POST'])
 def manageBankData():
+    # Only logged in users can access bank profile
+    if session.get('username') == None:
+        return redirect(url_for('home'))
     form = manageBankDataForm()
     search_form = SearchForm()
     status, cur, db, engine = BankConnection()
-    if  form.validate_on_submit():
+    isFB_Connected = 'false'
+    if form.bank_submit.data and form.validate_on_submit():
         ## check if there's prevoius BR and confirm to update it
 
         print()
-        target = os.path.join(APP_ROOT , 'Br_file/')
+        target = os.path.join(APP_ROOT, 'Br_file/')
         print(target)
         if not os.path.isdir(target):
             os.mkdir(target)
-        file  =  request.files.get('file_br')
+
+        file = request.files.get('file_br')
         print(file)
         filename = file.filename
         print(filename)
 
         if filename.split(".", 1)[1] != 'txt':
             flash('File extention should be txt', 'danger')
-            return render_template("ManageBankData.html", form=form)
+            return render_template("ManageBankData.html", form=form, form2=search_form, isFB_Connected=isFB_Connected)
 
         else:
             dest = "/".join([target, filename])
             print(dest)
             file.save(dest)
+        try:
+            db = firebase.database()
+            isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+            # businessRules_file = businessRules_file.data
+            sanction_list = open("Br_file/" + filename, "r")
+            risk_countries = form.risk_countries.data
+            exceed_avg_tran = form.exceed_avg_tran.data
+            # type1 = form.type.data
+            amount = form.amount.data
+            db.child('Rule1').child('highRiskCountries').set(risk_countries)
+            db.child('Rule2').child('exceedingAvgTransaction').set(exceed_avg_tran)
+            # db.child('Rule3').child('suspiciousTransaction').child('Type').set(type1)
+            db.child('Rule3').child('suspiciousTransaction').child('amount').set(amount)
+            db.child('Rule4').child('blackList').set(sanction_list.read().splitlines())
+        except Exception as e:
+            flash('Please connect to the Internet..', 'danger')
+            return render_template("databaseSetup.html", form=form, status=status)
 
-        db = firebase.database()
-        #businessRules_file = businessRules_file.data
-        sanction_list = open("Br_file/" + filename , "r")
-        risk_countries = form.risk_countries.data
-        exceed_avg_tran = form.exceed_avg_tran.data
-        #type1 = form.type.data
-        amount = form.amount.data
-        db.child('Rule1').child('highRiskCountries').set(risk_countries)
-        db.child('Rule2').child('exceedingAvgTransaction').set(exceed_avg_tran)
-        #db.child('Rule3').child('suspiciousTransaction').child('Type').set(type1)
-        db.child('Rule3').child('suspiciousTransaction').child('amount').set(amount)
-        db.child('Rule4').child('blackList').set(sanction_list.read().splitlines())
+        if status == 1:  # If upload BR and didn't set DB redirect to database setup
+            flash('Successfully uploaded your business rules..Setup your database connection to start the analysis',
+                  'success')
+            form = dbSetupForm()
+            return render_template("databaseSetup.html", form=form, status=status)
 
-        if status == 1:
-            flash(Markup('You didn''t setup you''r database, please click <a href="/DatabaseSetup" class="alert-link">here</a> to setup ') , 'danger')
-        return redirect((url_for('manageBankData',  form = form)))
+        if status == 0:
+            task = Analysis.delay()
+            form2 = SearchForm()
+            flash('Successfully uploaded your business rules..', 'success')
+            return render_template('analysisView.html', JOBID=task.id, form2=form2)
 
+        return redirect((url_for('manageBankData', form=form, form2=search_form, isFB_Connected=isFB_Connected)))
 
     if search_form.search_submit.data and search_form.validate_on_submit():
-        return redirect((url_for('searchResult', id= search_form.search.data , form2 = search_form )))
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
-
-
-    if session.get('username') == None:
-        return redirect(url_for('home'))
-    return render_template("ManageBankData.html" , form = form , form2 =search_form )
+    return render_template("ManageBankData.html", form=form, form2=search_form, isFB_Connected=isFB_Connected)
 
 #cases page
 
@@ -475,10 +489,26 @@ def case(id):
     cur.execute("SELECT * FROM SMI_DB.Client WHERE clientID=%s " % ( client_ID))
     data2 = cur.fetchall()
 
+    client_BR = data2[0][5]
+    Br_flag = True
+    print('Br', client_BR)
+    Br_dic = {}
+    if client_BR == '0000':
+        Br_flag = False
+    else:
+        if client_BR[0] == '1':
+            Br_dic['1'] = 'Client Name is in sanction list'
+        if client_BR[1] == '1':
+            Br_dic['2'] = 'Client location in risk contries'
+        if client_BR[2] == '1':
+            Br_dic['3'] = 'Client exceeded avg amount of transactions'
+        if client_BR[3] == '1':
+            Br_dic['4'] = 'Client exceeded max amount of transaction'
+
     cur.execute("SELECT * FROM SuspiciousTransaction WHERE clientID=%s " % (client_ID))
     transaction = cur.fetchall()
 
-    return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = id, transaction=transaction)
+    return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = id, transaction=transaction , Br_flag=Br_flag ,Br_dic=Br_dic)
 
 
 @app.route('/download/<id>', methods=['GET','POST'])
@@ -523,8 +553,23 @@ def download(id):
     for each in record2:
      clientName = each[1]
 
+    client_BR = record2[0][5]
+    Br_flag = True
+    print('Br', client_BR)
+    Br_dic = {}
+    if client_BR == '0000':
+        Br_flag = False
+    else:
+        if client_BR[0] == '1':
+            Br_dic['1'] = 'Client Name is in sanction list'
+        if client_BR[1] == '1':
+            Br_dic['2'] = 'Client location in risk contries'
+        if client_BR[2] == '1':
+            Br_dic['3'] = 'Client exceeded avg amount of transactions'
+        if client_BR[3] == '1':
+            Br_dic['4'] = 'Client exceeded max amount of transaction'
 
-    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber ,caseDate = caseDate,label = profileLabel ,label_name = label_name , transaction = transaction)
+    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber ,caseDate = caseDate,label = profileLabel ,label_name = label_name , transaction = transaction ,Br_flag=Br_flag ,Br_dic=Br_dic )
 
     pdf = pdfkit.from_string(rendered, False)
     response = make_response(pdf)
@@ -544,15 +589,15 @@ def DatabaseSetup():
     if session.get('username') == None:
         return redirect(url_for('home'))
     form = dbSetupForm()
-    form2 = SearchForm()
     status, cur, db, engine = BankConnection()
-    db = firebase.database()
-    isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+    try:
+     db = firebase.database()
+     isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+    except Exception as e:
+        flash('Please connect to the Internet..', 'danger')
+        return render_template("databaseSetup.html", form=form, status=status)
 
 
-
-    if form2.search_submit.data and form2.validate_on_submit():
-        return redirect((url_for('searchResult', id=form2.search.data, form2=form2)))
 
 
     if form.validate_on_submit():
@@ -566,7 +611,7 @@ def DatabaseSetup():
                     and form.db_user.data == config['DB_credentials']['user']:
 
                 flash('You are already connected to this database..', 'success')
-                return render_template("databaseSetup.html", form=form ,form2=form2 )
+                return render_template("databaseSetup.html", form=form, status = status)
 
         config = configparser.ConfigParser()
         config['DB_credentials'] = {'host': form.db_host.data,
@@ -578,21 +623,23 @@ def DatabaseSetup():
         status, cur, db, engine= BankConnection()
         if status == 1:
             flash('Unable to connect please try again..', 'danger')
-            return render_template("databaseSetup.html", form=form , form2=form2)
+            return render_template("databaseSetup.html", form=form, status = status)
         else:
-            if isFB_Connected != 'false':
+            if isFB_Connected == 'false':
                 flash('Successfully connected to the database..Upload your business rules to start the analysis', 'success')
                 search_form = SearchForm()
                 form = manageBankDataForm()
-                return render_template("ManageBankData.html", form=form, form2=form2)
+                return render_template("ManageBankData.html", form=form, form2=search_form)
+            else:
+                task = Analysis.delay()
+                form2 = SearchForm()
+                flash('Successfully connected to the database..', 'success')
+                return render_template('analysisView.html', JOBID=task.id, form2=form2)
 
-            # Check if bussinse rule is uploaded
+                # Check if bussinse rule is uploaded
             flash('Successfully connected to the database..', 'success')
-            return render_template("databaseSetup.html", form=form , form2=form2)
-
-
-
-    if status == 0: #If DB is already set bring the form.
+            return render_template("databaseSetup.html", form=form, status = status)
+    if status == 0:  # If DB is already set bring the form.
         config = configparser.ConfigParser()
         config.read('credentials.ini')
         form.db_host.data = config['DB_credentials']['host']
@@ -601,7 +648,7 @@ def DatabaseSetup():
         form.db_user.data = config['DB_credentials']['user']
 
 
-    return render_template("databaseSetup.html", form = form , form2=form2)
+    return render_template("databaseSetup.html", form = form, status = status)
 
 
 
