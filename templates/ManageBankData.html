@@ -337,7 +337,8 @@
             </form>
 
 
-            <form action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data" >
+            <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data" >
+             {{ form.hidden_tag() }}
             <div  id="div1" style="display: none" >
                    <div class="form-group">
 
@@ -346,7 +347,7 @@
 
 
 
-                      <input name='file_br' type="file" accept="Br_file/*" />
+                      <input name='file_br' type="file" accept="Br_User/*" />
                          <p class="help-block">file extention, .json</p>
                        {% if is_Br_submitted==1  %} <p class="help-block" style="color: red">please select a file </p> {% endif %}
                    {% if file_exttintion_json==1  %} <p class="help-block" style="color: red">file must be in json format </p> {% endif %}
@@ -356,7 +357,9 @@
 
                        <div class="col-md-8" >
                            <br><br>
+                           <div style="width:40%; margin-left:28%;">
                            {{ form3.submitRule(class="btn btn-primary btn-block btn-flat" )}}
+                           </div>
 
                        </div>
                       </div>

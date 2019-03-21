@@ -412,15 +412,13 @@ def manageBankData():
 
 
 
-
-
     if search_form.search_submit.data and search_form.validate_on_submit():
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3=form3) ))
 
     # upload BR
     print(form3.submitRule.data)
     print(form3.validate_on_submit())
-    if form3.submitRule.data:
+    if form3.submitRule.data and form3.validate_on_submit():
         print('iam in manage data')
         target = os.path.join(APP_ROOT, 'Br_User/')
         print(target)
