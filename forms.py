@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField ,FileField , SelectField , SelectMultipleField , validators , HiddenField , FloatField
 from wtforms.validators import DataRequired, Length, Email, EqualTo , InputRequired
-from flask_wtf.file import FileRequired
 from wtforms.widgets import html5
 
 
@@ -90,14 +89,19 @@ class dbSetupForm(FlaskForm):
    submit = SubmitField('Connect')
 
 
+class uploadForm(FlaskForm):
+    businessRules_file = FileField('Upload Business Rules:')
+    submitRule = SubmitField('Submit')
+
+
+
 
 
 #Manage bank data from
 
 class manageBankDataForm(FlaskForm):
-   businessRules_file = FileField('Upload Business Rules:' )
-   sanction_list = FileField('Upload Sanction List:' )
-   risk_countries = SelectMultipleField('High Risk Countries:', choices=[('Afghanistan', 'Afghanistan') , ('Åland Islands', 'Åland Islands') ,
+    sanction_list = FileField('Upload Sanction List:' )
+    risk_countries = SelectMultipleField('High Risk Countries:', choices=[('Afghanistan', 'Afghanistan') , ('Åland Islands', 'Åland Islands') ,
     ('Albania', 'Albania'), ('Algeria', 'Algeria') , ('American', 'American') , ('Andorra', 'Andorra') , ('Angola', 'Angola') , ('Anguilla', 'Anguilla')
      , ('Antarctica', 'Antarctica') , ('Antigua and Barbuda', 'Antigua and Barbuda') , ('Argentina', 'Argentina') , ('Armenia', 'Armenia')
       , ('Austria', 'Austria') , ('Azerbaijan', 'Azerbaijan'), ('Bahamas', 'Bahamas'), ('Bahrain', 'Bahrain'), ('Bangladesh', 'Bangladesh')
@@ -139,10 +143,10 @@ class manageBankDataForm(FlaskForm):
       ('Tunisia', 'Tunisia'), ('Turkey', 'Turkey'), ('Turkmenistan', 'Turkmenistan'), ('Turks and Caicos Islands', 'Turks and Caicos Islands'), ('Tuvalu', 'Tuvalu'), ('Uganda', 'Uganda'), ('Ukraine', 'Ukraine'), ('United Arab Emirates', 'United Arab Emirates'),
       ('United Kingdom', 'United Kingdom'), ('United States', 'United States'), ('United States Minor Outlying Islands', 'United States Minor Outlying Islands'), ('Uruguay', 'Uruguay'), ('Uzbekistan', 'Uzbekistan') , ('Vanuatu', 'Vanuatu'), ('Venezuela', 'Venezuela')
       , ('Viet Nam', 'Viet Nam'), ('Virgin Islands, British', 'Virgin Islands, British'), ('Virgin Islands, U.S.', 'Virgin Islands, U.S.'), ('Wallis and Futuna', 'Wallis and Futuna'), ('Western Sahara', 'Western Sahara') , ('Yemen', 'Yemen'), ('Zambia', 'Zambia'), ('Zimbabwe', 'Zimbabwe')])
-   exceed_avg_tran = FloatField('Exceeding Average Transactions With:', validators= [DataRequired()] , widget=html5.NumberInput(step="any"))
-   #type = SelectField('Type: ' , choices=[('Transfer', 'Transfer') , ('Cash out', 'Cash out')])
-   amount = FloatField('Transaction Risk Amount:' ,validators= [DataRequired()] ,  widget=html5.NumberInput(step="any"))
-   bank_submit = SubmitField('submit')
+    exceed_avg_tran = FloatField('Exceeding Average Transactions With:', validators= [DataRequired()] , widget=html5.NumberInput(step="any"))
+    #type = SelectField('Type: ' , choices=[('Transfer', 'Transfer') , ('Cash out', 'Cash out')])
+    amount = FloatField('Transaction Risk Amount:' ,validators= [DataRequired()] ,  widget=html5.NumberInput(step="any"))
+    bank_submit = SubmitField('submit')
 
 
 

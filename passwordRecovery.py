@@ -29,7 +29,7 @@ class passwordRecovery:
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
-        server.login(msg['From'],'SMIHMWN19')
+        server.login(msg['From'],'$MI7320KSU2019')
         server.sendmail(msg['From'], msg['To'], msg.as_string())
         server.quit()
         self.updatePassword()

@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response , render_template_string
 from flaskext.mysql import MySQL
-from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm , SearchForm , ViewProfileForm , ViewCasesForm , reportCase
+from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm ,\
+    SearchForm , ViewProfileForm , ViewCasesForm , reportCase , uploadForm
 from DBconnection import connection2, BankConnection , firebaseConnection
 from passwordRecovery import passwordRecovery
 from datetime import datetime
@@ -42,6 +43,16 @@ mysql.init_app(app)
 app.config['Upload_folder'] = 'Br_file/'
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
 app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
+
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'smi.ksu2019@gmail.com'
+app.config['MAIL_PASSWORD'] = '$MI7320KSU2019'
+app.config['MAIL_DEFAULT_SENDER'] = 'smi.ksu2019@gmail.com'
+
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tiger@localhost/SMI_DB'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -341,13 +352,15 @@ def manageBankData():
         return redirect(url_for('home'))
     form = manageBankDataForm()
     search_form = SearchForm()
+    form3 = uploadForm()
+
     status, cur, db, engine = BankConnection()
     isFB_Connected = 'false'
     if form.bank_submit.data and form.validate_on_submit():
         ## check if there's prevoius BR and confirm to update it
 
         print()
-        target = os.path.join(APP_ROOT, 'Br_file/')
+        target = os.path.join(APP_ROOT, 'br_file/')
         print(target)
         if not os.path.isdir(target):
             os.mkdir(target)
@@ -359,7 +372,7 @@ def manageBankData():
 
         if filename.split(".", 1)[1] != 'txt':
             flash('File extention should be txt', 'danger')
-            return render_template("ManageBankData.html", form=form, form2=search_form, isFB_Connected=isFB_Connected)
+            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,isFB_Connected=isFB_Connected)
 
         else:
             dest = "/".join([target, filename])
@@ -395,12 +408,46 @@ def manageBankData():
             flash('Successfully uploaded your business rules..', 'success')
             return render_template('analysisView.html', JOBID=task.id, form2=form2)
 
-        return redirect((url_for('manageBankData', form=form, form2=search_form, isFB_Connected=isFB_Connected)))
+        return redirect((url_for('manageBankData', form=form, form2=search_form, form3=form3,isFB_Connected=isFB_Connected)))
+
+
+
+
 
     if search_form.search_submit.data and search_form.validate_on_submit():
-        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3=form3) ))
 
-    return render_template("ManageBankData.html", form=form, form2=search_form, isFB_Connected=isFB_Connected)
+    # upload BR
+    print(form3.submitRule.data)
+    print(form3.validate_on_submit())
+    if form3.submitRule.data:
+        print('iam in manage data')
+        target = os.path.join(APP_ROOT, 'Br_User/')
+        print(target)
+        if not os.path.isdir(target):
+            os.mkdir(target)
+
+        file1 = request.files.get('file_br')
+        print(file1)
+        if file1 is None:
+            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                   isFB_Connected=isFB_Connected,
+                                   is_Br_submitted=1)
+        filename = file1.filename
+        print(filename)
+
+        if filename.split(".", 1)[1] != 'json':
+            file_exttintion_json = 1
+            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                   isFB_Connected=isFB_Connected,
+                                   file_exttintion_json=file_exttintion_json)
+
+        else:
+            dest = "/".join([target, filename])
+            print(dest)
+            file1.save(dest)
+
+    return render_template("ManageBankData.html", form=form, form2=search_form, isFB_Connected=isFB_Connected , form3=form3)
 
 #cases page
 
@@ -675,6 +722,122 @@ def Report(id):
         flash('Email has been sent Successfully..', 'success')
     return render_template("email.html", form = form, clientID= id)
 
+'''
+@app.route('/', methods=['GET','POST'] )
+def uploadBR():
+    # Only logged in users can access bank profile
+    if session.get('username') == None:
+        return redirect(url_for('home'))
+    form = manageBankDataForm()
+    search_form = SearchForm()
+    form3 = uploadForm()
+    status, cur, db, engine = BankConnection()
+    is_Br_submitted = 0
+    file_exttintion_json = 0
+    isFB_Connected = 'false'
+    operands = ['==', 'not', 'or', 'in', 'and', '<', '>', '<=', '>=']
+
+    if form3.submitRule.data and form3.validate_on_submit():
+        print('hi')
+        target = os.path.join(APP_ROOT, 'Br_User/')
+        print(target)
+        if not os.path.isdir(target):
+            os.mkdir(target)
+
+        file1 = request.files.get('file_br')
+        print(file1)
+        if file1 is None:
+            return render_template("ManageBankData.html", form=form, form2=search_form, form3 = form3, isFB_Connected=isFB_Connected,
+                                   is_Br_submitted=1)
+        filename = file1.filename
+        print(filename)
+
+        if filename.split(".", 1)[1] != 'json':
+            file_exttintion_json = 1
+            return render_template("ManageBankData.html", form=form, form2=search_form , form3 = form3, isFB_Connected=isFB_Connected,
+                                   is_Br_submitted=is_Br_submitted, file_exttintion_json=file_exttintion_json)
+
+        else:
+            dest = "/".join([target, filename])
+            print(dest)
+            file1.save(dest)
+
+        with open('Br_file/Br1.json') as f:
+            data = json.load(f)
+            print(data)
+
+        if 'Rules' not in data:
+            print('ERROR...your file is not well structured... please follow the file format in the sample')
+
+        firebase = firebaseConnection()
+        fb = firebase.database()
+
+        print('Number of rules', len(data['Rules']))
+
+        i = 1
+        for each in data['Rules']:
+            ### 1-check Key words structure #####
+            if 'Rule{}'.format(i) not in data['Rules']:
+                print('ERROR in your file structure in Rule{} please follow the format'.format(i))
+                break
+            else:
+                print('Correct format')
+            ### 2- check if all attriubtes in dataset ###
+
+            if data['Rules']['Rule' + str(i)][0] not in cur.column_names:
+                print('Rule{} attribute {} not found in the dataset'.format(i, data['Rules']['Rule1'][0]))
+                break
+            else:
+                print('all attributes were found in dataset')
+
+            ### 3- check if theres illegal operand ####
+
+            if data['Rules']['Rule' + str(i)][1] not in operands:
+                print('Illegal operand ({})in Rule{}'.format(data['Rules']['Rule1'][1], i))
+                break
+            else:
+                print('all legal operand')
+
+                #### 4- If there's rule for sanction, check if names are uploaded and get the names ####
+            if data['Rules']['Rule' + str(i)][2] == 'sanctionList':
+                print('Rule for sanction list')
+                if ('sanctionList' not in data):
+                    print('for Rule{} Please  upload the sanction list section to the file'.format(i))
+                else:
+                    print('Sanction list is uploaded:')
+                    if len(data['sanctionList']) == 0:
+                        print('Sanction List is empty please upload the names')
+                    print(data['sanctionList'])
+
+            else:
+                print('No Rule for sanction list ')
+
+                #### 5- If there's rule for risk countries, check if countries are uploaded and get the countries ####
+            if data['Rules']['Rule' + str(i)][2] == 'HighRiskCountries':
+                print('Rule for Risk countries')
+                if ('HighRiskCountries' not in data):
+                    print('for Rule{} Please  upload the HighRiskCountries list section to the file'.format(i))
+                else:
+                    print('HighRiskCountries list is uploaded:')
+                    if len(data['HighRiskCountries']) == 0:
+                        print('HighRiskCountries is empty please upload the names')
+                    print(data['HighRiskCountries'])
+
+            else:
+                print('No Rule for HighRiskCountries ')
+
+            print('*******************************')
+
+            fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
+
+            i = i + 1
+
+
+
+
+
+    return redirect((url_for('manageBankData', form=form, form2=search_form , form3 = form3, isFB_Connected=isFB_Connected,
+                             is_Br_submitted=is_Br_submitted))) '''
 
 ######CELERY PART #########
 

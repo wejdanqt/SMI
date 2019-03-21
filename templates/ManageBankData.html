@@ -258,7 +258,7 @@
             <!-- form start -->
 </br>
 
-            <form  action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data"
+            <form action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data"
             {% if not(isFB_Connected == 'flase') %}
                 onsubmit="return confirm('Are you sure you want to update your old Business Rules connection?')"
             {% endif %}>
@@ -269,23 +269,6 @@
                   <hr>
 
                  <!-- Business Rules Sample -->
-                <div  id="div1" style="display: none" >
-                   <div class="form-group">
-
-                       <h4 class="col-md-3 control-label">Rule#1:</h4>
-                   <div class="col-md-8">
-                       <!-- Select input form -->
-
-                   <!--  <input type="file" id="exampleInputFile"  > -->
-
-                    </div>
-                      </div>
-
-
-                </br>
-                    <hr>
-
-                </div>
 
                    <!-- Upload Business Rules -->
                    <div  style="display: none" id="div2">
@@ -297,6 +280,8 @@
                        <input name='file_br' type="file" accept="Br_file/*" />
                    <!--  <input type="file" id="exampleInputFile"  > -->
                   <p class="help-block">file extention, .txt</p>
+                        {% if file_exttintion==1 %} <p class="help-block" style="color:red;">file extention must be .txt</p>{% endif %}
+                      {% if file_submit==1 %} <p class="help-block" style="color:red;">Please upload your sanction list</p>{% endif %}
                     </div>
                       </div>
 
@@ -349,6 +334,38 @@
                    </div>
               </div>
               <!-- /.box-body -->
+            </form>
+
+
+            <form action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data" >
+            <div  id="div1" style="display: none" >
+                   <div class="form-group">
+
+                       <h7 class="col-md-3 control-label">Uplaod Bussinse Rules:</h7>
+                   <div class="col-md-8">
+
+
+
+                      <input name='file_br' type="file" accept="Br_file/*" />
+                         <p class="help-block">file extention, .json</p>
+                       {% if is_Br_submitted==1  %} <p class="help-block" style="color: red">please select a file </p> {% endif %}
+                   {% if file_exttintion_json==1  %} <p class="help-block" style="color: red">file must be in json format </p> {% endif %}
+
+
+                    </div>
+
+                       <div class="col-md-8" >
+                           <br><br>
+                           {{ form3.submitRule(class="btn btn-primary btn-block btn-flat" )}}
+
+                       </div>
+                      </div>
+
+
+                </br>
+                    <hr>
+
+                </div>
             </form>
 
                 <script>
