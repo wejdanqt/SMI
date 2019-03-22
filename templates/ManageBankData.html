@@ -277,7 +277,7 @@
                         {{ form.sanction_list.label(class="col-md-3 control-label") }}
                    <div class="col-md-8">
                        <!-- Select input form -->
-                       <input name='file_br' type="file" accept="Br_file/*" />
+                       <input name='file_br' type="file" accept="Br_file/*"  required/>
                    <!--  <input type="file" id="exampleInputFile"  > -->
                   <p class="help-block">file extention, .txt</p>
                         {% if file_exttintion==1 %} <p class="help-block" style="color:red;">file extention must be .txt</p>{% endif %}
@@ -294,7 +294,8 @@
                    <!-- <label class="col-md-3 control-label" style="text-align:left;">High Risk countries:</label>-->
                    <div class="col-md-8">
 
-                                {{ form.risk_countries( id='testSelect1') }}
+                                {{ form.risk_countries( id='testSelect1' ) }}
+
 
 
                             <!-- JavaScript for Multi Select -->
