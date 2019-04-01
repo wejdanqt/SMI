@@ -19,11 +19,6 @@ filtered_df.head(2)
 
 
 
-
-
-
-
-
 '''
 
 

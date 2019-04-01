@@ -21,9 +21,11 @@
 }
 
     </style>
+
+
   <script>
 
-      window.addEventListener( "pageshow", function ( event ) {
+     window.addEventListener( "pageshow", function ( event ) {
   var historyTraversal = event.persisted ||
                          ( typeof window.performance != "undefined" &&
                               window.performance.navigation.type === 2 );
@@ -93,31 +95,44 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <!-- Notifications: style can be found in dropdown.less -->
-          <li class="dropdown notifications-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o"></i>
-              <span class="label label-warning"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li class="header">You have 1 notifications</li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu">
+         <li class="dropdown notifications-menu">
+                  <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bell-o"></i>
+                    <span  class = "label label-warning badge" id ='alert_count'  style="visibility: {% if alert > 0 %}visible
+                            {% else %}hidden {% endif %};">{{ alert }}</span>
+                  </a>
+                  <ul class="dropdown-menu" style="visibility: {% if alert == 0 %}hidden
+                            {% else %}visible {% endif %};">
+                    <li class="header">You have {{ alert }} new cases</li>
+                    <li>
+                      <!-- inner menu: contains the actual data -->
+                      <ul class="menu">
 
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-warning text-yellow"></i>
-                      This is to inform you that there is a
-                      suspicious transaction has been detected in
-                      “Client Name: Khaild, ID:12345” account
-                    </a>
-                  </li>
+                        <li>
+                          <a href="{{ url_for('cases') }}">
+                            <i class="fa fa-warning text-yellow"></i>
+                             New suspicious transaction has been detected
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="footer"><a  href="{{ url_for('cases') }}">View Cases</a></li>
+                  </ul>
+                </li>
 
-                </ul>
-              </li>
-              <li class="footer"><a href="#">View Cases</a></li>
-            </ul>
-          </li>
+                <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+                        <script type="text/javascript" charset="utf-8">
+                            var socket = io.connect('http://' + document.domain + ':' + location.port);
+                            socket.on('connect', function() {
+                                socket.emit('my event', {data: 'I\'m connected!'});
+                             });
+                            socket.on('count-update', function(msg) {
+                                console.log(msg);
+                                var alertCount = document.getElementById('alert_count');
+                                alertCount.textContent = msg.count;
+                            });
+                        </script>
+
 
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">

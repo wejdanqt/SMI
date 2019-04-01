@@ -77,4 +77,3 @@ class DecisionTree:
         db.commit()
         cur.close()
         db.close()
-

@@ -33,15 +33,14 @@
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
 
- <header class="main-header">
+<header class="main-header">
     <!-- Logo -->
     <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-
-   <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
+           <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg">  <img  height="42" width="130" src="{{url_for('static', filename='dist/img/newlogo.png')}}"alt="User Image"></span>
+     <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -56,45 +55,56 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <!-- Notifications: style can be found in dropdown.less -->
-          <li class="dropdown notifications-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o"></i>
-              <span class="label label-warning">1</span>
-            </a>
-            <ul class="dropdown-menu">
-              <li class="header">You have 1 notifications</li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu">
+         <li class="dropdown notifications-menu">
+                  <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bell-o"></i>
+                    <span  class = "label label-warning badge" id ='alert_count'  style="visibility: {% if alert > 0 %}visible
+                            {% else %}hidden {% endif %};">{{ alert }}</span>
+                  </a>
+                  <ul class="dropdown-menu" style="visibility: {% if alert == 0 %}hidden
+                            {% else %}visible {% endif %};">
+                    <li class="header">You have {{ alert }} new cases</li>
+                    <li>
+                      <!-- inner menu: contains the actual data -->
+                      <ul class="menu">
 
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-warning text-yellow"></i>
-                      This is to inform you that there is a
-                      suspicious transaction has been detected in
-                      “Client Name: Khaild, ID:12345” account
-                    </a>
-                  </li>
+                        <li>
+                          <a href="{{ url_for('cases') }}">
+                            <i class="fa fa-warning text-yellow"></i>
+                             New suspicious transaction has been detected
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="footer"><a  href="{{ url_for('cases') }}">View Cases</a></li>
+                  </ul>
+                </li>
 
-                </ul>
-              </li>
-              <li class="footer"><a href="#">View Cases</a></li>
-            </ul>
-          </li>
+                <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+                        <script type="text/javascript" charset="utf-8">
+                            var socket = io.connect('http://' + document.domain + ':' + location.port);
+                            socket.on('connect', function() {
+                                socket.emit('my event', {data: 'I\'m connected!'});
+                             });
+                            socket.on('count-update', function(msg) {
+                                console.log(msg);
+                                var alertCount = document.getElementById('alert_count');
+                                alertCount.textContent = msg.count;
+                            });
+                        </script>
+
 
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img  src="{{url_for('static', filename='dist/img/Riyadh1.png')}}" class="user-image" alt="User Image">
-              <span class="hidden-xs">Sarah Sami</span>
+               <span class="hidden-xs">{{ session['username'] }}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="{{url_for('static', filename='dist/img/Riyadh1.png')}}" class="img-circle" alt="User Image">
 
                 <p>
-                  Sarah Sami
+                 {{ session['username'] }}
                   <small>AML Officer</small>
                 </p>
               </li>
@@ -117,46 +127,29 @@
     </nav>
   </header>
   <!-- Left side column. contains the logo and sidebar -->
-
-
-
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
-      <div class="user-panel">
-        <div class="pull-left image">
-            <img src="{{url_for('static', filename='dist/img/Riyadh.png')}}" class="img-circle" alt="User Image">
-
-        </div>
-        <div class="pull-left info">
-          <p>{{ session['username'] }}</p>
-          <a href="#"> <i class="fa fa-circle text-success"></i> Logged in</a>
-        </div>
-      </div>
-
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-          <a href="#">
-            <i class="fa fa-search"></i> <span>Search For Client</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-
-              <form action="#" method="get" class="sidebar-form">
+           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
+              </a>
+                <!-- search form -->
+              <form action="#" method="post" class="sidebar-form" role="form">
+                   {{ form2.hidden_tag() }}
               <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search...">
-                    <span class="input-group-btn">
-                      <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                      </button>
-                    </span>
+                   {{ form2.search( class="form-control")  }}
+
+                        {{ form2.search_submit(class="btn btn-primary btn-block btn-flat input-group-btn") }}
+                        <!-- <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                      </button> -->
               </div>
             </form>
-          </a>
+
         </li>
 
 
@@ -167,6 +160,20 @@
           </a>
         </li>
 
+
+             <li class="treeview">
+          <a href="#">
+            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+           <li><a href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
+            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
+
+          </ul>
+        </li>
         <li>
           <a href="{{ url_for('manageProfile') }}">
           <span>Manage Profile</span>
@@ -174,13 +181,7 @@
         </li>
 
 
-        <li>
-            <a href="{{ url_for('manageBankData') }}">
-          <span>Manage Bank Data</span>
-          </a>
-        </li>
-
-        <li>
+          <li>
            <a href="{{ url_for('cases') }}">
           <span>View Cases</span>
             <span class="pull-right-container">
@@ -202,7 +203,7 @@
 
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
+                <div class="alert alert-{{ category }} style="font-size:160%;"">
                 {{ message }}
                 </div>
 
@@ -239,7 +240,7 @@
 
                   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-        <form action="{{ url_for('Report',id=clientID) }}" role="form" method="post" id="reused_form"  >
+        <form action="{{ url_for('Report',id=clientID) }}" role="form" method="post" id="reused_form" enctype="multipart/form-data" >
                     {{ form.hidden_tag() }}
             <div class="form-group">
                    {{ form.reciver.label(class="form-control-label") }}
@@ -282,13 +283,21 @@
                         {{ form.email_body(class="form-control form-control-lg") }}
                     {% endif %}
             </div>
+            <div class="form-group">
+                <p class="form-control-label"> <b>Attachment:</b></p>
+                  <input name='file_case' type="file" accept="Case_file/*" />
+
+            </div>
+
+
+
+
 
    <div style="margin-left:50%;">
-        {{ form.submit(class="btn btn-primary", style="width:39%;" ) }}
+        {{ form.submit(class="btn btn-default", style="width:39%;" ) }}
 
                        </div>
-        <br>
-
+<br>
         </form>
     </div>
 </div>
@@ -322,11 +331,6 @@
   </div>
   <!-- /.content-wrapper -->
 
-
-
-  <footer class="main-footer">
-
-  </footer>
 
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed

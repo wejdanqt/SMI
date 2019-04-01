@@ -39,10 +39,10 @@
     <!-- Logo -->
     <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-
+           <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
       <!-- logo for regular state and mobile devices -->
-           <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
+     <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -57,46 +57,56 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <!-- Notifications: style can be found in dropdown.less -->
-          <li class="dropdown notifications-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o"></i>
-              <span class="label label-warning">1</span>
-            </a>
-            <ul class="dropdown-menu">
-              <li class="header">You have 1 notifications</li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu">
+         <li class="dropdown notifications-menu">
+                  <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bell-o"></i>
+                    <span  class = "label label-warning badge" id ='alert_count'  style="visibility: {% if alert > 0 %}visible
+                            {% else %}hidden {% endif %};">{{ alert }}</span>
+                  </a>
+                  <ul class="dropdown-menu" style="visibility: {% if alert == 0 %}hidden
+                            {% else %}visible {% endif %};">
+                    <li class="header">You have {{ alert }} new cases</li>
+                    <li>
+                      <!-- inner menu: contains the actual data -->
+                      <ul class="menu">
 
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-warning text-yellow"></i>
-                      This is to inform you that there is a
-                      suspicious transaction has been detected in
-                      “Client Name: Khaild, ID:12345” account
-                    </a>
-                  </li>
+                        <li>
+                          <a href="{{ url_for('cases') }}">
+                            <i class="fa fa-warning text-yellow"></i>
+                             New suspicious transaction has been detected
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="footer"><a  href="{{ url_for('cases') }}">View Cases</a></li>
+                  </ul>
+                </li>
 
-                </ul>
-              </li>
-              <li class="footer"><a href="#">View Cases</a></li>
-            </ul>
-          </li>
+                <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+                        <script type="text/javascript" charset="utf-8">
+                            var socket = io.connect('http://' + document.domain + ':' + location.port);
+                            socket.on('connect', function() {
+                                socket.emit('my event', {data: 'I\'m connected!'});
+                             });
+                            socket.on('count-update', function(msg) {
+                                console.log(msg);
+                                var alertCount = document.getElementById('alert_count');
+                                alertCount.textContent = msg.count;
+                            });
+                        </script>
+
 
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-
-
-              <span class="hidden-xs">{{ session['username'] }}</span>
+               <span class="hidden-xs">{{ session['username'] }}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
 
-
                 <p>
-                  {{ session['username'] }}
+                 {{ session['username'] }}
                   <small>AML Officer</small>
                 </p>
               </li>
@@ -112,14 +122,14 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="{{ url_for('logout') }}"><i class="fa fa-sign-out"></i></a>
+            <a href="#"><i class="fa fa-sign-out"></i></a>
           </li>
         </ul>
       </div>
     </nav>
   </header>
   <!-- Left side column. contains the logo and sidebar -->
-  <aside class="main-sidebar">
+    <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->

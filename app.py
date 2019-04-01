@@ -20,13 +20,13 @@ import pdfkit
 from flask_mail import Mail, Message
 from celery.result import AsyncResult
 import json
-
+from flask_socketio import SocketIO
+from flask_socketio import send, emit
 
 
 
 
 app = Flask(__name__)
-
 
 
 
@@ -53,6 +53,8 @@ app.config['MAIL_USERNAME'] = 'smi.ksu2019@gmail.com'
 app.config['MAIL_PASSWORD'] = '$MI7320KSU2019'
 app.config['MAIL_DEFAULT_SENDER'] = 'smi.ksu2019@gmail.com'
 
+socketio = SocketIO(app)
+
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tiger@localhost/SMI_DB'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -78,6 +80,7 @@ firebase = firebaseConnection()
 @app.route("/")
 def home():
     return render_template("home.html")
+
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -121,7 +124,6 @@ def login():
             db.commit()
             cur.close()
             db.close()
-    #task = long_task.apply_async()
     return render_template('login.html', form=form)
 
 
@@ -191,18 +193,26 @@ def forgotPass():
 
 @app.route("/bankProfile" , methods=['GET', 'POST'])
 def bankP():
+
     if session.get('username') == None:
         return redirect(url_for('home'))
+    username = session.get('username')
     cur, db, engine = connection2()
     query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
     cur.execute(query)
     totalAlert = cur.fetchall()
     totalAlert = len(totalAlert)
     print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
     form = SearchForm()
+
+    '''query1 = "SELECT email FROM SMI_DB.AMLOfficer WHERE userName = '" + username + "'"
+    cur.execute(query1)
+    email = cur.fetchall()'''
+
     if form.validate_on_submit():
         return redirect((url_for('searchResult', id= form.search.data)))  # or what you want
-    return render_template("bankProfile.html", form = form, alert = totalAlert)
+    return render_template("bankProfile.html", form = form, alert = totalAlert )
 
 
 
@@ -214,19 +224,27 @@ def searchResult(id):
         return redirect(url_for('home'))
     else:
         cur, db , engine = connection2()
-        query = "SELECT * FROM SMI_DB.Client WHERE clientID = '" + id + "'"
+        query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'"
+        '''query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"'''
         cur.execute(query)
         data = cur.fetchall()
         form = ViewProfileForm()
         search_form = SearchForm()
 
+        query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+        cur.execute(query)
+        totalAlert = cur.fetchall()
+        totalAlert = len(totalAlert)
+        print(totalAlert)
+        socketio.emit('count-update', {'count': totalAlert})
+
         if form.view_submit.data and form.validate_on_submit():
             return redirect((url_for('clientProfile', id = id  , form = form )))
 
         if search_form.search_submit.data and search_form.validate_on_submit():
-            return redirect((url_for('searchResult', id=search_form.search.data , form2 = search_form)))
+            return redirect((url_for('searchResult', id=search_form.search.data , form2 = search_form , alert = totalAlert)))
 
-        return render_template("searchResult.html", data=data, form=form , form2 = search_form)
+        return render_template("searchResult.html", data=data, form=form , form2 = search_form , alert = totalAlert)
 
 
 
@@ -235,14 +253,26 @@ def clientProfile(id):
     client_form = clientForm()
     new_comment = newCommentForm()
     old_comment = oldCommentForm()
+    search_form = SearchForm()
     cur, db , engine = connection2()
 
     # Only logged in users can access bank profile
     if session.get('username') == None:
         return redirect(url_for('home'))
     else:
+
+        # alert code
+
+        query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+        cur.execute(query)
+        totalAlert = cur.fetchall()
+        totalAlert = len(totalAlert)
+        print(totalAlert)
+        socketio.emit('count-update', {'count': totalAlert})
+
         #Retrive client Info from database:
-        query = "SELECT * FROM SMI_DB.Client WHERE clientID = '" + id + "'"
+        '''query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'" '''
+        query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'"
         cur.execute(query)
         record = cur.fetchall()
         result=[]
@@ -253,7 +283,7 @@ def clientProfile(id):
             client_form.clientClass.data = column[3]  #clientClass
 
         cur, db , engine= connection2()
-        query = "SELECT * FROM SMI_DB.Comment WHERE clientID = '" + id + "'"
+        query = "SELECT * FROM SMI_DB.Comment WHERE clientID  =  '" + id + "'"
         cur.execute(query)
         record = cur.fetchall()
 
@@ -280,6 +310,9 @@ def clientProfile(id):
 
         print(old_comment.delete.data)
 
+        if search_form.search_submit.data and search_form.validate_on_submit():
+            return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
+
 
         if  old_comment.validate_on_submit():
             print('the delete works')
@@ -292,7 +325,8 @@ def clientProfile(id):
             return redirect(url_for('clientProfile' , oldCommentForm=old_comment , id1 = id1 , id = id))
 
 
-        return render_template("clientProfile.html", clientForm = client_form, commentForm = new_comment , record = record , oldCommentForm=old_comment)
+        return render_template("clientProfile.html", clientForm = client_form, commentForm = new_comment , record = record ,
+                               oldCommentForm=old_comment , form2=search_form , alert = totalAlert)
 
 
 
@@ -304,13 +338,21 @@ def manageProfile():
     if session.get('username') == None:
         return redirect(url_for('home'))
 
+     # alert code
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
 
     if form.profile_submit.data and form.validate_on_submit():
         cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
         data2 = cursor.fetchone()
         if not (data2 is None):
             flash('This Email is already exists please try another email', 'danger')
-            return render_template('ManageProfile.html', form=form , form2 = search_form )
+            return render_template('ManageProfile.html', form=form , form2 = search_form , alert = totalAlert)
         else:
             cur, db , engine = connection2()
             cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' , password = '" + form.password.data + "' WHERE userName = '" + username + "'" )
@@ -328,9 +370,9 @@ def manageProfile():
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
-        return redirect((url_for('searchResult', id= search_form.search.data , form2 = search_form )))
+        return redirect((url_for('searchResult', id= search_form.search.data , form2 = search_form  , alert = totalAlert)))
 
-    return render_template("ManageProfile.html", form=form , form2 = search_form )
+    return render_template("ManageProfile.html", form=form , form2 = search_form , alert = totalAlert )
 
 
 @app.route('/deleteProfile', methods=['GET','POST'])
@@ -354,61 +396,92 @@ def manageBankData():
     search_form = SearchForm()
     form3 = uploadForm()
 
+    #alert code
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+
     status, cur, db, engine = BankConnection()
-    isFB_Connected = 'false'
+    operands = ['==', 'not', 'or', 'in', 'and', '<', '>', '<=', '>=']
+
+    if status == 1:  # If upload BR and didn't set DB redirect to database setup
+        flash(Markup('To upload your rules you need to setup your database connection first, please click <a href="/DatabaseSetup" class="alert-link">here</a>'),
+              'danger')
+        return render_template("ManageBankData.html", form=form, form2=search_form,
+                               form3=form3 , alert = totalAlert)
+
+    #if status == 0:
+        #task = Analysis.delay()
+        #form2 = SearchForm()
+        #flash('Successfully uploaded your business rules..', 'success')
+        #return render_template('analysisView.html', JOBID=task.id, form2=form2 ,alert = totalAlert )
+
+    fb = firebase.database()
+    isFB_Connected = fb.child().get().val()
+
+    # retrive from firbase
+    amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+    avg = fb.child('Rule2').child('exceedingAvgTransaction').get().val()
+    form.amount.data = amount
+    form.exceed_avg_tran.data = avg
+
+
+    FB_flag = 0
+
+    if not (isFB_Connected is None):
+        FB_flag = 1
+    print('isFB_Connected', FB_flag)
+
     if form.bank_submit.data and form.validate_on_submit():
         ## check if there's prevoius BR and confirm to update it
 
-        print()
+        #print()
         target = os.path.join(APP_ROOT, 'br_file/')
-        print(target)
+        #print(target)
         if not os.path.isdir(target):
             os.mkdir(target)
 
         file = request.files.get('file_br')
-        print(file)
+        #print(file)
         filename = file.filename
-        print(filename)
+        #print(filename)
 
         if filename.split(".", 1)[1] != 'txt':
             flash('File extention should be txt', 'danger')
-            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,isFB_Connected=isFB_Connected)
+            return render_template("ManageBankData.html", form=form, form2=search_form,
+                                   form3=form3 , alert = totalAlert)
 
         else:
             dest = "/".join([target, filename])
-            print(dest)
+            #print(dest)
             file.save(dest)
         try:
-            db = firebase.database()
-            isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+
             # businessRules_file = businessRules_file.data
             sanction_list = open("Br_file/" + filename, "r")
             risk_countries = form.risk_countries.data
             exceed_avg_tran = form.exceed_avg_tran.data
             # type1 = form.type.data
             amount = form.amount.data
-            db.child('Rule1').child('highRiskCountries').set(risk_countries)
-            db.child('Rule2').child('exceedingAvgTransaction').set(exceed_avg_tran)
+            fb.child('Rule1').child('highRiskCountries').set(risk_countries)
+            fb.child('Rule2').child('exceedingAvgTransaction').set(exceed_avg_tran)
             # db.child('Rule3').child('suspiciousTransaction').child('Type').set(type1)
-            db.child('Rule3').child('suspiciousTransaction').child('amount').set(amount)
-            db.child('Rule4').child('blackList').set(sanction_list.read().splitlines())
+            fb.child('Rule3').child('suspiciousTransaction').child('amount').set(amount)
+            fb.child('Rule4').child('blackList').set(sanction_list.read().splitlines())
+
         except Exception as e:
             flash('Please connect to the Internet..', 'danger')
-            return render_template("databaseSetup.html", form=form, status=status)
+            print(e)
+            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                   FB_flag=FB_flag , alert = totalAlert)
 
-        if status == 1:  # If upload BR and didn't set DB redirect to database setup
-            flash('Successfully uploaded your business rules..Setup your database connection to start the analysis',
-                  'success')
-            form = dbSetupForm()
-            return render_template("databaseSetup.html", form=form, status=status)
-
-        if status == 0:
-            task = Analysis.delay()
-            form2 = SearchForm()
-            flash('Successfully uploaded your business rules..', 'success')
-            return render_template('analysisView.html', JOBID=task.id, form2=form2)
-
-        return redirect((url_for('manageBankData', form=form, form2=search_form, form3=form3,isFB_Connected=isFB_Connected)))
+        return redirect((url_for('manageBankData', form=form, form2=search_form, form3=form3,
+                                 FB_flag=FB_flag , alert = totalAlert)))
 
 
 
@@ -429,23 +502,106 @@ def manageBankData():
         print(file1)
         if file1 is None:
             return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
-                                   isFB_Connected=isFB_Connected,
-                                   is_Br_submitted=1)
+                                   FB_flag=FB_flag,
+                                   is_Br_submitted=1 , alert = totalAlert)
         filename = file1.filename
         print(filename)
 
         if filename.split(".", 1)[1] != 'json':
             file_exttintion_json = 1
             return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
-                                   isFB_Connected=isFB_Connected,
-                                   file_exttintion_json=file_exttintion_json)
+                                   FB_flag=FB_flag,
+                                   file_exttintion_json=file_exttintion_json , alert = totalAlert)
 
         else:
             dest = "/".join([target, filename])
             print(dest)
             file1.save(dest)
+            cur.execute("SELECT * FROM Bank_DB.transaction LIMIT 1")
+            with open(dest) as f:
+                data = json.load(f)
 
-    return render_template("ManageBankData.html", form=form, form2=search_form, isFB_Connected=isFB_Connected , form3=form3)
+            print(data)
+            i = 1
+            ## 1- check file structure ##
+            if 'Rules' not in data:
+                print('ERROR...your file is not well structured... please follow the file format in the sample')
+                flash('ERROR...your file is not well structured... please follow the file format in the sample',
+                      'danger')
+                return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                       FB_flag=FB_flag , alert = totalAlert)
+            try:
+                fb = firebase.database()
+                for each in data['Rules']:
+
+              ### 2-check Key words structure #####
+                    if 'Rule{}'.format(i) not in data['Rules']:
+                        print('ERROR in your file structure in Rule{} please follow the format'.format(i))
+                        flash('ERROR in your file structure in Rule{} please follow the format'.format(i),'danger')
+                        return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                               FB_flag=FB_flag , alert = totalAlert)
+                     ### 3- check if all attriubtes in dataset ###
+                    if data['Rules']['Rule' + str(i)][0] not in cur.column_names:
+                        print('Rule{} attribute {} not found in the dataset'.format(i,data['Rules']['Rule{}'.format(i)][0]))
+                        flash('Rule{} attribute {} not found in the dataset'.format(i,data['Rules']['Rule{}'.format(i)][0]),'danger')
+                        return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                               FB_flag=FB_flag , alert = totalAlert)
+                     ### 4- check if theres illegal operand ####
+
+                    if data['Rules']['Rule' + str(i)][1] not in operands:
+                        print('Illegal operand ({})in Rule{}'.format(data['Rules']['Rule{}'.format(i)][1], i))
+                        flash('Illegal operand ({})in Rule{}'.format(data['Rules']['Rule{}'.format(i)][1], i),'danger')
+                        return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                               FB_flag=FB_flag , alert = totalAlert)
+                    #### 5- If there's rule for sanction, check if names are uploaded and get the names ####
+                    if data['Rules']['Rule' + str(i)][2] == 'sanctionList':
+                        print('Rule for sanction list')
+                        if ('sanctionList' not in data):
+                            print('for Rule{} Please  upload the sanction list section to the file'.format(i))
+                            flash('for Rule{} Please  upload the sanction list section to the file'.format(i), 'danger')
+                            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                                   FB_flag=FB_flag , alert = totalAlert)
+                        else:
+                            print('Sanction list is uploaded:')
+                            if len(data['sanctionList']) == 0:
+                                print('Sanction List is empty please upload the names')
+                                flash('Sanction List is empty please upload the names', 'danger')
+                                return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                                       FB_flag=FB_flag , alert = totalAlert)
+                            else:
+                                print(data['sanctionList'])
+                                fb.child('sanctionList').set(data['sanctionList'])
+                    #### 6- If there's rule for risk countries, check if countries are uploaded and get the countries ####
+                    if data['Rules']['Rule' + str(i)][2] == 'HighRiskCountries':
+                        print('Rule for Risk countries')
+                        if ('HighRiskCountries' not in data):
+                            print('for Rule{} Please  upload the HighRiskCountries list section to the file'.format(i))
+                            flash('for Rule{} Please  upload the HighRiskCountries list section to the file'.format(i), 'danger')
+                            return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                                   FB_flag=FB_flag , alert = totalAlert)
+                        else:
+                            print('HighRiskCountries list is uploaded:')
+                            if len(data['HighRiskCountries']) == 0:
+                                print('HighRiskCountries is empty please upload the names')
+                                flash('HighRiskCountries is empty please upload the names','danger')
+                                return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                                       FB_flag=FB_flag , alert = totalAlert)
+                            else:
+                                print(data['HighRiskCountries'])
+                                fb.child('HighRiskCountries').set(data['HighRiskCountries'])
+
+
+                    fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
+                    i=i+1
+
+
+            except Exception as e :
+                print(e)
+
+
+
+    return render_template("ManageBankData.html", form=form, form2=search_form, FB_flag=FB_flag ,
+                           form3=form3 , alert = totalAlert)
 
 #cases page
 
@@ -476,6 +632,19 @@ def cases():
         cur.execute("SELECT * FROM SMI_DB.ClientCase ORDER BY caseID DESC LIMIT %s OFFSET %s", (per_page, offset))
         cases = cur.fetchall()
 
+
+        #alert code
+
+        query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+        cur.execute(query)
+        totalAlert = cur.fetchall()
+        totalAlert = len(totalAlert)
+        print(totalAlert)
+        socketio.emit('count-update', {'count': totalAlert})
+
+
+        #.................
+
         if search_form.search_submit.data and search_form.validate_on_submit():
             return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
@@ -497,7 +666,7 @@ def cases():
         # e.g. Pagination(per_page_parameter='pp')
         #, pagination=pagination
 
-        return render_template("cases.html", cases = cases, form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0)
+        return render_template("cases.html", cases = cases, form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0 ,alert = totalAlert)
 
 #case page
 
@@ -518,6 +687,13 @@ def case(id):
     cur, db, engine = connection2()
     cur.execute("UPDATE ClientCase SET viewed = '0' WHERE caseID=%s " % (id))
 
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
 
 
     cur, db, engine = connection2()
@@ -553,7 +729,8 @@ def case(id):
     cur.execute("SELECT * FROM SuspiciousTransaction WHERE clientID=%s " % (client_ID))
     transaction = cur.fetchall()
 
-    return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = id, transaction=transaction , Br_flag=Br_flag ,Br_dic=Br_dic)
+    return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = client_ID
+                           ,caseId = id ,transaction=transaction, form2=search_form ,alert = totalAlert, Br_flag=Br_flag ,Br_dic=Br_dic)
 
 
 @app.route('/download/<id>', methods=['GET','POST'])
@@ -614,7 +791,9 @@ def download(id):
         if client_BR[3] == '1':
             Br_dic['4'] = 'Client exceeded max amount of transaction'
 
-    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber ,caseDate = caseDate,label = profileLabel ,label_name = label_name , transaction = transaction ,Br_flag=Br_flag ,Br_dic=Br_dic )
+    rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber
+                               ,caseDate = caseDate,label = profileLabel ,label_name = label_name ,
+                               transaction = transaction ,Br_flag=Br_flag ,Br_dic=Br_dic )
 
     pdf = pdfkit.from_string(rendered, False)
     response = make_response(pdf)
@@ -622,11 +801,6 @@ def download(id):
     response.headers['Content-Disposition'] = 'attachment; filename=case.pdf'
     return response
 
-'''@app.route("/addComment")
-def comment():
-    # Only logged in users can access bank profile
-    if session.get('username') == None:
-        return redirect(url_for('home'))'''
 
 @app.route("/DatabaseSetup", methods=['GET', 'POST'])
 def DatabaseSetup():
@@ -634,15 +808,34 @@ def DatabaseSetup():
     if session.get('username') == None:
         return redirect(url_for('home'))
     form = dbSetupForm()
+    form3 = uploadForm()
+    search_form = SearchForm()
     status, cur, db, engine = BankConnection()
+
+    #alert code
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+    #search code
+
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        return redirect((url_for('searchResult', id=search_form.search.data,
+                                 form2=search_form, form3=form3 , alert = totalAlert)))
+
+
+
     try:
-     db = firebase.database()
-     isFB_Connected = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+     fb = firebase.database() # if nothing is uploaded == None
+     isFB_Connected = fb.child().get().val()
     except Exception as e:
         flash('Please connect to the Internet..', 'danger')
-        return render_template("databaseSetup.html", form=form, status=status)
-
-
+        return render_template("databaseSetup.html", form=form, status=status ,
+                               form2=search_form, form3=form3 , alert = totalAlert )
 
 
     if form.validate_on_submit():
@@ -656,7 +849,8 @@ def DatabaseSetup():
                     and form.db_user.data == config['DB_credentials']['user']:
 
                 flash('You are already connected to this database..', 'success')
-                return render_template("databaseSetup.html", form=form, status = status)
+                return render_template("databaseSetup.html", form=form, status = status ,
+                                       form2=search_form, form3=form3 , alert = totalAlert)
 
         config = configparser.ConfigParser()
         config['DB_credentials'] = {'host': form.db_host.data,
@@ -668,22 +862,19 @@ def DatabaseSetup():
         status, cur, db, engine= BankConnection()
         if status == 1:
             flash('Unable to connect please try again..', 'danger')
-            return render_template("databaseSetup.html", form=form, status = status)
+            return render_template("databaseSetup.html", form=form, status = status ,
+                                   form2=search_form, form3=form3 , alert = totalAlert)
         else:
-            if isFB_Connected == 'false':
+            if isFB_Connected == None :
                 flash('Successfully connected to the database..Upload your business rules to start the analysis', 'success')
-                search_form = SearchForm()
                 form = manageBankDataForm()
-                return render_template("ManageBankData.html", form=form, form2=search_form)
-            else:
-                task = Analysis.delay()
-                form2 = SearchForm()
-                flash('Successfully connected to the database..', 'success')
-                return render_template('analysisView.html', JOBID=task.id, form2=form2)
+                return render_template("ManageBankData.html", form=form, form2=search_form,
+                                       form3= form3 , alert = totalAlert)
 
                 # Check if bussinse rule is uploaded
             flash('Successfully connected to the database..', 'success')
-            return render_template("databaseSetup.html", form=form, status = status)
+            return render_template("databaseSetup.html", form=form, status = status , form2=search_form,
+                                   form3=form3 , alert = totalAlert)
     if status == 0:  # If DB is already set bring the form.
         config = configparser.ConfigParser()
         config.read('credentials.ini')
@@ -693,7 +884,7 @@ def DatabaseSetup():
         form.db_user.data = config['DB_credentials']['user']
 
 
-    return render_template("databaseSetup.html", form = form, status = status)
+    return render_template("databaseSetup.html", form = form, status = status , alert = totalAlert , form2=search_form, form3=form3)
 
 
 
@@ -704,138 +895,104 @@ def Report(id):
         return redirect(url_for('home'))
 
     form = reportCase()
-    print('Inside Report')
-    print(form.reciver.data)
+    search_form = SearchForm()
+
+
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
+
+
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+    cur, db, engine = connection2()
+    cur.execute("SELECT * FROM SMI_DB.ClientCase WHERE caseID=%s " % (id))
+    record = cur.fetchall()
+    client_ID = record[0][3]
+    caseNumber = ''
+    caseDate = ''
+
+    for each1 in record:
+        caseNumber = each1[0]
+        caseDate = each1[2]
+
+    profileLabel = ''
+    if record[0][1] == 'Low':  # Need to change it Meduim
+        profileLabel = 'label label-warning'
+    else:  # High
+        profileLabel = 'label label-danger'
+    label_name = record[0][1]
+
+    # --------------------#----------------------#--------------------------#-------------#
+
+    query1 = "SELECT * FROM SMI_DB.SuspiciousTransaction WHERE clientID=%s " % (client_ID)
+    cur.execute(query1)
+    transaction = cur.fetchall()
+    # --------------------#----------------------#--------------------------#-------------#
+
+    query2 = "SELECT * FROM SMI_DB.Client WHERE clientID=%s " % (client_ID)
+    cur.execute(query2)
+    record2 = cur.fetchall()
+    clientName = ''
+    for each in record2:
+        clientName = each[1]
+
+    client_BR = record2[0][5]
+    Br_flag = True
+    print('Br', client_BR)
+    Br_dic = {}
+    if client_BR == '0000':
+        Br_flag = False
+    else:
+        if client_BR[0] == '1':
+            Br_dic['1'] = 'Client Name is in sanction list'
+        if client_BR[1] == '1':
+            Br_dic['2'] = 'Client location in risk contries'
+        if client_BR[2] == '1':
+            Br_dic['3'] = 'Client exceeded avg amount of transactions'
+        if client_BR[3] == '1':
+            Br_dic['4'] = 'Client exceeded max amount of transaction'
+
+    rendered = render_template('CaseToPrint.html', clientName=clientName, caseNumber=caseNumber
+                               , caseDate=caseDate, label=profileLabel, label_name=label_name,
+                               transaction=transaction , Br_flag=Br_flag ,Br_dic=Br_dic)
+
+    #######save case to working dierctory ##########
+    pdfFile = pdfkit.from_string(rendered, 'case.pdf')
+    #request.files.get('file_case') = pdfFile
+    #request.form['file_case'] = pdfFile
+    form.subject.data = 'Case#{}_{}'.format(id,clientName)
+    form.email_body.data = 'Fruad Report'
+
     if form.validate_on_submit():
-        #print('Calling sendReport')
-        #return redirect((url_for('sendReport', form=form)))
-        print('Inside sendReport')
-        print(form.reciver.data)
+        '''target = os.path.join(APP_ROOT, 'Case_file/')
+        print('target',target)
+        if not os.path.isdir(target):
+            os.mkdir(target)
+        file = request.files.get('file_case')
+        print('file',file)
+        filename = file.filename
+        print('fileNAME',filename)
+        dest = "/".join([target, filename])
+        print(dest)
+        file.save(dest)'''
         recipient = form.reciver.data
         msg = Message(form.subject.data, recipient.split())
         msg.body = form.email_body.data
+        with app.open_resource("case.pdf") as fp:
+            msg.attach("case.pdf", "case/pdf", fp.read())
         print(msg)
         mail.send(msg)
 
         flash('Email has been sent Successfully..', 'success')
-    return render_template("email.html", form = form, clientID= id)
-
-'''
-@app.route('/', methods=['GET','POST'] )
-def uploadBR():
-    # Only logged in users can access bank profile
-    if session.get('username') == None:
-        return redirect(url_for('home'))
-    form = manageBankDataForm()
-    search_form = SearchForm()
-    form3 = uploadForm()
-    status, cur, db, engine = BankConnection()
-    is_Br_submitted = 0
-    file_exttintion_json = 0
-    isFB_Connected = 'false'
-    operands = ['==', 'not', 'or', 'in', 'and', '<', '>', '<=', '>=']
-
-    if form3.submitRule.data and form3.validate_on_submit():
-        print('hi')
-        target = os.path.join(APP_ROOT, 'Br_User/')
-        print(target)
-        if not os.path.isdir(target):
-            os.mkdir(target)
-
-        file1 = request.files.get('file_br')
-        print(file1)
-        if file1 is None:
-            return render_template("ManageBankData.html", form=form, form2=search_form, form3 = form3, isFB_Connected=isFB_Connected,
-                                   is_Br_submitted=1)
-        filename = file1.filename
-        print(filename)
-
-        if filename.split(".", 1)[1] != 'json':
-            file_exttintion_json = 1
-            return render_template("ManageBankData.html", form=form, form2=search_form , form3 = form3, isFB_Connected=isFB_Connected,
-                                   is_Br_submitted=is_Br_submitted, file_exttintion_json=file_exttintion_json)
-
-        else:
-            dest = "/".join([target, filename])
-            print(dest)
-            file1.save(dest)
-
-        with open('Br_file/Br1.json') as f:
-            data = json.load(f)
-            print(data)
-
-        if 'Rules' not in data:
-            print('ERROR...your file is not well structured... please follow the file format in the sample')
-
-        firebase = firebaseConnection()
-        fb = firebase.database()
-
-        print('Number of rules', len(data['Rules']))
-
-        i = 1
-        for each in data['Rules']:
-            ### 1-check Key words structure #####
-            if 'Rule{}'.format(i) not in data['Rules']:
-                print('ERROR in your file structure in Rule{} please follow the format'.format(i))
-                break
-            else:
-                print('Correct format')
-            ### 2- check if all attriubtes in dataset ###
-
-            if data['Rules']['Rule' + str(i)][0] not in cur.column_names:
-                print('Rule{} attribute {} not found in the dataset'.format(i, data['Rules']['Rule1'][0]))
-                break
-            else:
-                print('all attributes were found in dataset')
-
-            ### 3- check if theres illegal operand ####
-
-            if data['Rules']['Rule' + str(i)][1] not in operands:
-                print('Illegal operand ({})in Rule{}'.format(data['Rules']['Rule1'][1], i))
-                break
-            else:
-                print('all legal operand')
-
-                #### 4- If there's rule for sanction, check if names are uploaded and get the names ####
-            if data['Rules']['Rule' + str(i)][2] == 'sanctionList':
-                print('Rule for sanction list')
-                if ('sanctionList' not in data):
-                    print('for Rule{} Please  upload the sanction list section to the file'.format(i))
-                else:
-                    print('Sanction list is uploaded:')
-                    if len(data['sanctionList']) == 0:
-                        print('Sanction List is empty please upload the names')
-                    print(data['sanctionList'])
-
-            else:
-                print('No Rule for sanction list ')
-
-                #### 5- If there's rule for risk countries, check if countries are uploaded and get the countries ####
-            if data['Rules']['Rule' + str(i)][2] == 'HighRiskCountries':
-                print('Rule for Risk countries')
-                if ('HighRiskCountries' not in data):
-                    print('for Rule{} Please  upload the HighRiskCountries list section to the file'.format(i))
-                else:
-                    print('HighRiskCountries list is uploaded:')
-                    if len(data['HighRiskCountries']) == 0:
-                        print('HighRiskCountries is empty please upload the names')
-                    print(data['HighRiskCountries'])
-
-            else:
-                print('No Rule for HighRiskCountries ')
-
-            print('*******************************')
-
-            fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
-
-            i = i + 1
+    return render_template("email.html", form = form, clientID= id , alert = totalAlert , form2=search_form )
 
 
-
-
-
-    return redirect((url_for('manageBankData', form=form, form2=search_form , form3 = form3, isFB_Connected=isFB_Connected,
-                             is_Br_submitted=is_Br_submitted))) '''
 
 ######CELERY PART #########
 
@@ -847,13 +1004,29 @@ def startAnalysis():
 def enqueue():
     task = Analysis.delay()
     form2 = SearchForm()
-    return render_template('analysisView.html', JOBID=task.id, form2=form2)
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+    return render_template('analysisView.html', JOBID=task.id, form2=form2 , alert = totalAlert)
 
 
 @app.route('/analysisView')
 def analysisView():
     form2 =SearchForm()
-    return render_template("analysisView.html",form2= form2)
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+    return render_template("analysisView.html",form2= form2 , alert = totalAlert)
 
 
 @app.route('/progress')

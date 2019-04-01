@@ -44,11 +44,10 @@
     <!-- Logo -->
     <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-
-   <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
+           <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg">  <img  height="42" width="130" src="{{url_for('static', filename='dist/img/newlogo.png')}}"alt="User Image"></span>
+     <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -63,45 +62,56 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <!-- Notifications: style can be found in dropdown.less -->
-          <li class="dropdown notifications-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o"></i>
-              <span class="label label-warning">1</span>
-            </a>
-            <ul class="dropdown-menu">
-              <li class="header">You have 1 notifications</li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu">
+         <li class="dropdown notifications-menu">
+                  <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-bell-o"></i>
+                    <span  class = "label label-warning badge" id ='alert_count'  style="visibility: {% if alert > 0 %}visible
+                            {% else %}hidden {% endif %};">{{ alert }}</span>
+                  </a>
+                  <ul class="dropdown-menu" style="visibility: {% if alert == 0 %}hidden
+                            {% else %}visible {% endif %};">
+                    <li class="header">You have {{ alert }} new cases</li>
+                    <li>
+                      <!-- inner menu: contains the actual data -->
+                      <ul class="menu">
 
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-warning text-yellow"></i>
-                      This is to inform you that there is a
-                      suspicious transaction has been detected in
-                      “Client Name: Khaild, ID:12345” account
-                    </a>
-                  </li>
+                        <li>
+                          <a href="{{ url_for('cases') }}">
+                            <i class="fa fa-warning text-yellow"></i>
+                             New suspicious transaction has been detected
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="footer"><a  href="{{ url_for('cases') }}">View Cases</a></li>
+                  </ul>
+                </li>
 
-                </ul>
-              </li>
-              <li class="footer"><a href="#">View Cases</a></li>
-            </ul>
-          </li>
+                <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+                        <script type="text/javascript" charset="utf-8">
+                            var socket = io.connect('http://' + document.domain + ':' + location.port);
+                            socket.on('connect', function() {
+                                socket.emit('my event', {data: 'I\'m connected!'});
+                             });
+                            socket.on('count-update', function(msg) {
+                                console.log(msg);
+                                var alertCount = document.getElementById('alert_count');
+                                alertCount.textContent = msg.count;
+                            });
+                        </script>
+
 
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img  src="{{url_for('static', filename='dist/img/Riyadh1.png')}}" class="user-image" alt="User Image">
-                 <span class="hidden-xs">{{ session['username'] }}</span>
+               <span class="hidden-xs">{{ session['username'] }}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="{{url_for('static', filename='dist/img/Riyadh1.png')}}" class="img-circle" alt="User Image">
 
                 <p>
-                  {{ session['username'] }}
+                 {{ session['username'] }}
                   <small>AML Officer</small>
                 </p>
               </li>
@@ -124,35 +134,19 @@
     </nav>
   </header>
   <!-- Left side column. contains the logo and sidebar -->
-
-
-
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
-      <div class="user-panel">
-        <div class="pull-left image">
-            <img src="{{url_for('static', filename='dist/img/Riyadh.png')}}" class="img-circle" alt="User Image">
-
-        </div>
-        <div class="pull-left info">
-          <p>{{ session['username'] }}</p>
-          <a href="#"> <i class="fa fa-circle text-success"></i> Logged in</a>
-        </div>
-      </div>
-
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-          <a href="#">
-            <a><i class="fa fa-search"></i> <span>Search For Client</span></a>
-
-     <!-- search form -->
-              <form action="" method="post" class="sidebar-form" role="form">
+           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
+              </a>
+                <!-- search form -->
+              <form action="#" method="post" class="sidebar-form" role="form">
                    {{ form2.hidden_tag() }}
               <div class="input-group">
                    {{ form2.search( class="form-control")  }}
@@ -163,7 +157,6 @@
               </div>
             </form>
 
-          </a>
         </li>
 
 
@@ -174,14 +167,8 @@
           </a>
         </li>
 
-        <li>
-          <a href="{{ url_for('manageProfile') }}">
-          <span>Manage Profile</span>
-          </a>
-        </li>
 
-
-           <li class="treeview">
+             <li class="treeview">
           <a href="#">
             <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
             <span class="pull-right-container">
@@ -189,13 +176,19 @@
             </span>
           </a>
           <ul class="treeview-menu">
-           <li><a href="{{ url_for('DatabaseSetup') }}"><i class="fa fa-circle-o"></i> Database Setup</a></li>
-            <li><a href="{{ url_for('manageBankData') }}"><i class="fa fa-circle-o"></i>business Rules Setup</a></li>
+           <li><a href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
+            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
 
           </ul>
         </li>
-
         <li>
+          <a href="{{ url_for('manageProfile') }}">
+          <span>Manage Profile</span>
+          </a>
+        </li>
+
+
+          <li>
            <a href="{{ url_for('cases') }}">
           <span>View Cases</span>
             <span class="pull-right-container">
@@ -208,7 +201,6 @@
     </section>
     <!-- /.sidebar -->
   </aside>
-
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
 
@@ -258,11 +250,13 @@
             <!-- form start -->
 </br>
 
+
             <form action="{{ url_for('manageBankData') }}" method="post" class="form-horizontal" role="form" enctype="multipart/form-data"
-            {% if not(isFB_Connected == 'flase') %}
-                onsubmit="return confirm('Are you sure you want to update your old Business Rules connection?')"
+            {% if (FB_flag == 1) %}
+                onsubmit="return confirm('Are you sure you want to update your old Business Rules?')"
             {% endif %}>
                     {{ form.hidden_tag() }}
+
               <div class="box-body">
               <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Upload Business Rules &ensp; &ensp; &ensp;
                   <input type="radio" name="tab" value="igottwo" onclick="show2();" /> Business Rules Sample
@@ -330,7 +324,7 @@
                       </div>
                     <hr>
                         <div style="width:40%; margin-left:28%;">
-                         {{ form.bank_submit(class="btn btn-primary btn-block btn-flat" )}}
+                         {{ form.bank_submit(class="btn btn-default btn-block btn-flat" )}}
                         </div>
                    </div>
               </div>
@@ -348,7 +342,7 @@
 
 
 
-                      <input name='file_br' type="file" accept="Br_User/*" />
+                      <input name='file_br' type="file" accept="Br_User/*" required />
                          <p class="help-block">file extention, .json</p>
                        {% if is_Br_submitted==1  %} <p class="help-block" style="color: red">please select a file </p> {% endif %}
                    {% if file_exttintion_json==1  %} <p class="help-block" style="color: red">file must be in json format </p> {% endif %}
@@ -358,8 +352,8 @@
 
                        <div class="col-md-8" >
                            <br><br>
-                           <div style="width:40%; margin-left:28%;">
-                           {{ form3.submitRule(class="btn btn-primary btn-block btn-flat" )}}
+                           <div style="width:40%; margin-left:55%;">
+                           {{ form3.submitRule(class="btn btn-default btn-block btn-flat" )}}
                            </div>
 
                        </div>
