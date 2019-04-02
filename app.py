@@ -440,13 +440,9 @@ def manageBankData():
     fb = firebase.database()
     isFB_Connected = fb.child().get().val()
 
-    FB_flag = 0
 
-    # retrive from firbase
-    #amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
-    #avg = fb.child('Rule2').child('exceedingAvgTransaction').get().val()
-    #form.amount.data = amount
-    #form.exceed_avg_tran.data = avg
+
+    FB_flag = 0
 
     if not (isFB_Connected is None):
         FB_flag = 1
@@ -608,13 +604,16 @@ def manageBankData():
                                 fb.child('HighRiskCountries').set(data['HighRiskCountries'])
 
 
-
                     fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
                     i=i+1
 
-
             except Exception as e :
                 print(e)
+          #retrive from firbase
+    amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+    avg = fb.child('Rule2').child('exceedingAvgTransaction').get().val()
+    form.amount.data = amount
+    form.exceed_avg_tran.data = avg
 
 
     return render_template("ManageBankData.html", form=form, form2=search_form, FB_flag=FB_flag ,
