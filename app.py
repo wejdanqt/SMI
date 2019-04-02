@@ -44,7 +44,6 @@ app.config['Upload_folder'] = 'Br_file/'
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
 app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
 
-
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
 app.config['MAIL_PORT'] = 587
@@ -415,12 +414,6 @@ def manageBankData():
         return render_template("ManageBankData.html", form=form, form2=search_form,
                                form3=form3 , alert = totalAlert)
 
-    #if status == 0:
-        #task = Analysis.delay()
-        #form2 = SearchForm()
-        #flash('Successfully uploaded your business rules..', 'success')
-        #return render_template('analysisView.html', JOBID=task.id, form2=form2 ,alert = totalAlert )
-
     fb = firebase.database()
     isFB_Connected = fb.child().get().val()
 
@@ -430,7 +423,6 @@ def manageBankData():
     form.amount.data = amount
     form.exceed_avg_tran.data = avg
 
-
     FB_flag = 0
 
     if not (isFB_Connected is None):
@@ -438,8 +430,15 @@ def manageBankData():
     print('isFB_Connected', FB_flag)
 
     if form.bank_submit.data and form.validate_on_submit():
-        ## check if there's prevoius BR and confirm to update it
 
+        #Tregr Code
+        if status == 0:
+            task = Analysis.delay()
+            form2 = SearchForm()
+            flash('Successfully uploaded your business rules..', 'success')
+            return render_template('analysisView.html', JOBID=task.id, form2=form2, alert=totalAlert)
+
+        ## check if there's prevoius BR and confirm to update it
         #print()
         target = os.path.join(APP_ROOT, 'br_file/')
         #print(target)
@@ -482,7 +481,6 @@ def manageBankData():
 
         return redirect((url_for('manageBankData', form=form, form2=search_form, form3=form3,
                                  FB_flag=FB_flag , alert = totalAlert)))
-
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
@@ -571,6 +569,7 @@ def manageBankData():
                             else:
                                 print(data['sanctionList'])
                                 fb.child('sanctionList').set(data['sanctionList'])
+
                     #### 6- If there's rule for risk countries, check if countries are uploaded and get the countries ####
                     if data['Rules']['Rule' + str(i)][2] == 'HighRiskCountries':
                         print('Rule for Risk countries')
@@ -597,7 +596,6 @@ def manageBankData():
 
             except Exception as e :
                 print(e)
-
 
 
     return render_template("ManageBankData.html", form=form, form2=search_form, FB_flag=FB_flag ,
