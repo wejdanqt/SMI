@@ -186,7 +186,7 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="#"><i class="fa fa-sign-out"></i></a>
+              <a href="/logout"><i class="fa fa-sign-out"></i></a>
           </li>
         </ul>
       </div>
@@ -267,12 +267,12 @@
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
+            <ol class="breadcrumb">
+           {%- for breadcrumb in breadcrumbs -%}
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+            {{ ' > ' if not loop.last }}
+        {%- endfor -%}
 
-
-      <ol class="breadcrumb">
-         <li><a href="{{ url_for('home') }}"><i class="fa fa-home"></i> Home</a></li>
-          <li><a href="{{ url_for('bankP') }}">Profile</a></li>
-        <li class="active">Case</li>
 
       </ol>
     </section>
@@ -287,8 +287,8 @@
 
           <h3 class="notranslate">
                 <div style="margin-left: 92%">
-
             <a href= '/download/{{ caseId }} ' class="btn btn-default" > <i class="fa fa-save"></i></a>
+
                 </div>
 
               <label class="{{label }}" class="profile-username text-center">{{ data[0][1] }}</label> &nbsp; {{ data2[0][1] }}</h3>
@@ -408,6 +408,19 @@
 </div>
 
       </div>
+
+      <script>
+          function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
+      </script>
 
 <!-- ./wrapper -->
 

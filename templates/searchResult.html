@@ -123,7 +123,7 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="#"><i class="fa fa-sign-out"></i></a>
+          <a href="/logout"><i class="fa fa-sign-out"></i></a>
           </li>
         </ul>
       </div>
@@ -205,10 +205,11 @@
         Search Result
       <!--  <small>preview of simple tables</small> -->
       </h1>
-    <ol class="breadcrumb">
-        <li><a href="Home.html"><i class="fa fa-home"></i> Home</a></li>
-        <li><a href="bankProfle.html">Profile</a></li>
-        <li class="active">Search Result</li>
+     <ol class="breadcrumb">
+           {%- for breadcrumb in breadcrumbs -%}
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+            {{ ' > ' if not loop.last }}
+        {%- endfor -%}
       </ol>
     </section>
 

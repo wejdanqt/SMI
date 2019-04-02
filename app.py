@@ -1,3 +1,4 @@
+import flask
 from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response , render_template_string
 from flaskext.mysql import MySQL
 from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm ,\
@@ -22,6 +23,12 @@ from celery.result import AsyncResult
 import json
 from flask_socketio import SocketIO
 from flask_socketio import send, emit
+from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
+import functools
+import collections
+import flask
+
+
 
 
 
@@ -55,6 +62,10 @@ app.config['MAIL_DEFAULT_SENDER'] = 'smi.ksu2019@gmail.com'
 socketio = SocketIO(app)
 
 
+# Initialize Flask-Breadcrumbs
+Breadcrumbs(app=app)
+
+
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tiger@localhost/SMI_DB'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #dbA = SQLAlchemy(app)
@@ -76,6 +87,12 @@ firebase = firebaseConnection()
 #....................
 
 
+
+#breadcrumbs
+
+
+
+#............
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -191,6 +208,7 @@ def forgotPass():
 
 
 @app.route("/bankProfile" , methods=['GET', 'POST'])
+@register_breadcrumb(app, '.', 'Profile')
 def bankP():
 
     if session.get('username') == None:
@@ -216,6 +234,7 @@ def bankP():
 
 
 @app.route("/searchResult/<id>" , methods=['GET', 'POST'])
+@register_breadcrumb(app, '.searchResult', 'Search result')
 def searchResult(id):
 
     # Only logged in users can access bank profile
@@ -248,6 +267,7 @@ def searchResult(id):
 
 
 @app.route("/clientProfile/<id>", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.clientProfile', 'Client profile')
 def clientProfile(id):
     client_form = clientForm()
     new_comment = newCommentForm()
@@ -330,6 +350,7 @@ def clientProfile(id):
 
 
 @app.route("/ManageProfile", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.manageProfile', 'Manage Profile')
 def manageProfile():
     form = bankProfileForm()
     search_form = SearchForm()
@@ -387,6 +408,8 @@ def deleteProfile():
 
 
 @app.route("/ManageBankData" , methods=['GET', 'POST'])
+#@register_breadcrumb(app, '.', 'Manage bank data')
+@register_breadcrumb(app, '.manageBankData', 'Business rules setup')
 def manageBankData():
     # Only logged in users can access bank profile
     if session.get('username') == None:
@@ -417,27 +440,23 @@ def manageBankData():
     fb = firebase.database()
     isFB_Connected = fb.child().get().val()
 
-    # retrive from firbase
-    amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
-    avg = fb.child('Rule2').child('exceedingAvgTransaction').get().val()
-    form.amount.data = amount
-    form.exceed_avg_tran.data = avg
-
     FB_flag = 0
+
+    # retrive from firbase
+    #amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+    #avg = fb.child('Rule2').child('exceedingAvgTransaction').get().val()
+    #form.amount.data = amount
+    #form.exceed_avg_tran.data = avg
 
     if not (isFB_Connected is None):
         FB_flag = 1
     print('isFB_Connected', FB_flag)
 
+    print(form.bank_submit.data)
+    print(form.validate_on_submit())
+
     if form.bank_submit.data and form.validate_on_submit():
-
-        #Tregr Code
-        if status == 0:
-            task = Analysis.delay()
-            form2 = SearchForm()
-            flash('Successfully uploaded your business rules..', 'success')
-            return render_template('analysisView.html', JOBID=task.id, form2=form2, alert=totalAlert)
-
+        print('why')
         ## check if there's prevoius BR and confirm to update it
         #print()
         target = os.path.join(APP_ROOT, 'br_file/')
@@ -448,7 +467,7 @@ def manageBankData():
         file = request.files.get('file_br')
         #print(file)
         filename = file.filename
-        #print(filename)
+        print(filename)
 
         if filename.split(".", 1)[1] != 'txt':
             flash('File extention should be txt', 'danger')
@@ -457,7 +476,7 @@ def manageBankData():
 
         else:
             dest = "/".join([target, filename])
-            #print(dest)
+            print(dest)
             file.save(dest)
         try:
 
@@ -486,9 +505,8 @@ def manageBankData():
     if search_form.search_submit.data and search_form.validate_on_submit():
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3=form3) ))
 
+
     # upload BR
-    print(form3.submitRule.data)
-    print(form3.validate_on_submit())
     if form3.submitRule.data and form3.validate_on_submit():
         print('iam in manage data')
         target = os.path.join(APP_ROOT, 'Br_User/')
@@ -590,6 +608,7 @@ def manageBankData():
                                 fb.child('HighRiskCountries').set(data['HighRiskCountries'])
 
 
+
                     fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
                     i=i+1
 
@@ -606,6 +625,7 @@ def manageBankData():
 
 
 @app.route("/Cases" , methods=['GET', 'POST'])
+@register_breadcrumb(app, '.cases', 'Cases')
 def cases():
 
     search = False
@@ -669,6 +689,7 @@ def cases():
 #case page
 
 @app.route("/case/<id>", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.cases.case', 'Case')
 def case(id):
     # Only logged in users can access bank profile
 
@@ -801,6 +822,7 @@ def download(id):
 
 
 @app.route("/DatabaseSetup", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.DatabaseSetup', 'Database setup')
 def DatabaseSetup():
     # Only logged in users can access bank profile
     if session.get('username') == None:
@@ -887,6 +909,7 @@ def DatabaseSetup():
 
 
 @app.route("/Report/<id>", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.cases.case.Report', 'Email')
 def Report(id):
     # Only logged in users can access bank profile
     if session.get('username') == None:

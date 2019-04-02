@@ -193,7 +193,7 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="#"><i class="fa fa-sign-out"></i></a>
+            <a href="/logout"><i class="fa fa-sign-out"></i></a>
           </li>
         </ul>
       </div>
@@ -293,12 +293,16 @@
         Bank Profile
 
       </h1>
+  <ol class="breadcrumb">
+           {%- for breadcrumb in breadcrumbs -%}
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+            {{ ' > ' if not loop.last }}
+        {%- endfor -%}
 
-      <ol class="breadcrumb">
-        <li><a href="{{ url_for('home') }}"><i class="fa fa-home"></i> Home</a></li>
-        <li><a href="#">Profile</a></li>
 
       </ol>
+
+
     </section>
 
 

@@ -147,7 +147,7 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="#"><i class="fa fa-sign-out"></i></a>
+             <a href="/logout"><i class="fa fa-sign-out"></i></a>
           </li>
         </ul>
       </div>
@@ -242,11 +242,11 @@
       <section class="content-header">
 
         <ol class="breadcrumb">
-           <li><a href="{{ url_for('home') }}"><i class="fa fa-home"></i> Home</a></li>
-          <li><a href="{{ url_for('bankP') }}">Profile</a></li>
-          <li><a href="searchResult.html">Search Result</a></li>
-          <li class="active">Client Profile</li>
-        </ol>
+           {%- for breadcrumb in breadcrumbs -%}
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+            {{ ' > ' if not loop.last }}
+        {%- endfor -%}
+      </ol>
       </section>
 
     <h1>Client Profile</h1>

@@ -127,7 +127,7 @@
           </li>
           <!-- Control Sidebar Toggle Button -->
           <li>
-            <a href="#"><i class="fa fa-sign-out"></i></a>
+              <a href="/logout"><i class="fa fa-sign-out"></i></a>
           </li>
         </ul>
       </div>
@@ -220,11 +220,16 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
 
-      <ol class="breadcrumb">
-        <li><a href="{{ url_for('home') }}"><i class="fa fa-home"></i> Home</a></li>
-          <li><a href="{{ url_for('bankP') }}">Profile</a></li>
-        <li class="active">Manage Bank Data</li>
+       <ol class="breadcrumb">
+           {%- for breadcrumb in breadcrumbs -%}
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+            {{ ' > ' if not loop.last }}
+        {%- endfor -%}
+
+
       </ol>
+
+
     </section>
 
 </br>
@@ -258,8 +263,8 @@
                     {{ form.hidden_tag() }}
 
               <div class="box-body">
-              <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Upload Business Rules &ensp; &ensp; &ensp;
-                  <input type="radio" name="tab" value="igottwo" onclick="show2();" /> Business Rules Sample
+              <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Business Rules Template &ensp; &ensp; &ensp;
+                  <input type="radio" name="tab" value="igottwo" onclick="show2();" /> Upload Business Rule
                   <hr>
 
                  <!-- Business Rules Sample -->
@@ -333,7 +338,7 @@
 
 
             <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data" >
-             {{ form.hidden_tag() }}
+             {{ form3.hidden_tag() }}
             <div  id="div1" style="display: none" >
                    <div class="form-group">
 
@@ -408,9 +413,7 @@ function myFunction() {
 
 
 
-  <footer class="main-footer">
 
-  </footer>
 
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed
