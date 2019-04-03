@@ -408,7 +408,6 @@ def deleteProfile():
 
 
 @app.route("/ManageBankData" , methods=['GET', 'POST'])
-#@register_breadcrumb(app, '.', 'Manage bank data')
 @register_breadcrumb(app, '.manageBankData', 'Business rules setup')
 def manageBankData():
     # Only logged in users can access bank profile
@@ -493,6 +492,12 @@ def manageBankData():
             print(e)
             return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
                                    FB_flag=FB_flag , alert = totalAlert)
+        #treger code
+        if status == 0:
+            task = Analysis.delay()
+            form2 = SearchForm()
+            flash('Successfully uploaded your business rules..', 'success')
+            return render_template('analysisView.html', JOBID=task.id, form2=form2 , alert = totalAlert)
 
         return redirect((url_for('manageBankData', form=form, form2=search_form, form3=form3,
                                  FB_flag=FB_flag , alert = totalAlert)))
@@ -607,13 +612,19 @@ def manageBankData():
                     fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
                     i=i+1
 
+
             except Exception as e :
                 print(e)
-          #retrive from firbase
+
+    #retrive from firbase
     amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
     avg = fb.child('Rule2').child('exceedingAvgTransaction').get().val()
     form.amount.data = amount
     form.exceed_avg_tran.data = avg
+
+
+    # treger code
+
 
 
     return render_template("ManageBankData.html", form=form, form2=search_form, FB_flag=FB_flag ,
