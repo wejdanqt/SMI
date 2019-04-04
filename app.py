@@ -242,8 +242,7 @@ def searchResult(id):
         return redirect(url_for('home'))
     else:
         cur, db , engine = connection2()
-        query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'"
-        '''query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"'''
+        query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"
         cur.execute(query)
         data = cur.fetchall()
         form = ViewProfileForm()
@@ -290,8 +289,8 @@ def clientProfile(id):
         socketio.emit('count-update', {'count': totalAlert})
 
         #Retrive client Info from database:
-        '''query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'" '''
-        query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'"
+        query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"
+
         cur.execute(query)
         record = cur.fetchall()
         result=[]
@@ -301,22 +300,37 @@ def clientProfile(id):
             client_form.clientSalary.data = column[2] #clientSalary
             client_form.clientClass.data = column[3]  #clientClass
 
+        #Retreive old comments
+        if type(id) == str:
+            query1 = "SELECT * FROM SMI_DB.Client WHERE clientName = '" + id + "'"
+            cur.execute(query1)
+            data = cur.fetchall()
+            for each in data:
+                id = each[0]
+
+            print(id)
+            print(type(id))
+
         cur, db , engine= connection2()
-        query = "SELECT * FROM SMI_DB.Comment WHERE clientID  =  '" + id + "'"
+        query = "SELECT * FROM SMI_DB.Comment WHERE clientID  = '" + str(id) + "'"
         cur.execute(query)
         record = cur.fetchall()
 
-    #if not (record is None) :
-        #for column in record:
-            #old_comment.PrecommentDate.data = column[2] #comment date
-            #old_comment.PrecommentContent.data = column[1] #comment body
-        #return render_template("clientProfile.html", clientForm=client_form, commentForm=new_comment,oldCommentForm=old_comment)
 
         if  new_comment.add_submit.data and new_comment.validate_on_submit():
             print("works")
             cur, db, engine = connection2()
             date_now = datetime.now()
             formatted_date = date_now.strftime('%Y-%m-%d %H:%M:%S')
+
+            if type(id) == str:
+                query1 = "SELECT * FROM SMI_DB.Client WHERE clientName = '" + id + "'"
+                cur.execute(query1)
+                data = cur.fetchall()
+                for each in data:
+                    id = each[0]
+
+
             query = "INSERT INTO SMI_DB.Comment (commentBody, commentDate, clientID, officerName ) VALUES(%s,%s,%s,%s)"
             val = (new_comment.commentBody.data, formatted_date, id, session['username'])
             print(new_comment.commentBody.data)
@@ -494,7 +508,7 @@ def manageBankData():
                                    FB_flag=FB_flag , alert = totalAlert)
         #treger code
         if status == 0:
-            task = Analysis.delay()
+            task = Analysis.delay(0)
             form2 = SearchForm()
             flash('Successfully uploaded your business rules..', 'success')
             return render_template('analysisView.html', JOBID=task.id, form2=form2 , alert = totalAlert)
@@ -535,15 +549,23 @@ def manageBankData():
             print(dest)
             file1.save(dest)
             cur.execute("SELECT * FROM Bank_DB.transaction LIMIT 1")
-            with open(dest) as f:
-                data = json.load(f)
+            try:
+                with open(dest) as f:
+                    data = json.load(f)
 
-            print(data)
+                print(data)
+            except Exception as e:
+                flash('Sorry...your file is not well structured... please follow the file format in the sample',
+                      'danger')
+                return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
+                                       FB_flag=FB_flag, alert=totalAlert)
+
             i = 1
+
             ## 1- check file structure ##
             if 'Rules' not in data:
-                print('ERROR...your file is not well structured... please follow the file format in the sample')
-                flash('ERROR...your file is not well structured... please follow the file format in the sample',
+                print('Sorry...your file is not well structured... please follow the file format in the sample')
+                flash('Sorry...your file is not well structured... please follow the file format in the sample',
                       'danger')
                 return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
                                        FB_flag=FB_flag , alert = totalAlert)
@@ -612,6 +634,15 @@ def manageBankData():
                     fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
                     i=i+1
 
+                    # treger code
+                    if status == 0:
+                        task = Analysis.delay(1)
+                        form2 = SearchForm()
+                        flash('Successfully uploaded your business rules..', 'success')
+                        return render_template('analysisView.html', JOBID=task.id, form2=form2, alert=totalAlert)
+
+
+
 
             except Exception as e :
                 print(e)
@@ -629,7 +660,6 @@ def manageBankData():
 
     return render_template("ManageBankData.html", form=form, form2=search_form, FB_flag=FB_flag ,
                            form3=form3 , alert = totalAlert)
-
 #cases page
 
 
@@ -642,7 +672,6 @@ def cases():
     q = request.args.get('q')
     if q:
         search = True
-
 
     # Only logged in users can access bank profile
     if session.get('username') == None:
@@ -694,12 +723,11 @@ def cases():
         # e.g. Pagination(per_page_parameter='pp')
         #, pagination=pagination
 
-        return render_template("cases.html", cases = cases, form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0 ,alert = totalAlert)
+        return render_template("cases.html", cases = cases, numOfcase = len(cases) , form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0 ,alert = totalAlert)
 
 #case page
 
 @app.route("/case/<id>", methods=['GET', 'POST'])
-@register_breadcrumb(app, '.cases.case', 'Case')
 def case(id):
     # Only logged in users can access bank profile
 
@@ -731,7 +759,7 @@ def case(id):
     client_ID = data[0][3]
 
     profileLabel=''
-    if data[0][1] == 'Low':#Need to change it Meduim
+    if data[0][1] == 'Medium':#Meduim
         profileLabel ='label label-warning'
     else:#High
         profileLabel = 'label label-danger'
@@ -740,11 +768,16 @@ def case(id):
     data2 = cur.fetchall()
 
     client_BR = data2[0][5]
+    client_custom_BR = data2[0][6]
+    print('client_custom_BR',client_custom_BR)
     Br_flag = True
+    Custom_BR_flag =True
     print('Br', client_BR)
     Br_dic = {}
+    Custom_BR=[]
     if client_BR == '0000':
         Br_flag = False
+
     else:
         if client_BR[0] == '1':
             Br_dic['1'] = 'Client Name is in sanction list'
@@ -755,11 +788,23 @@ def case(id):
         if client_BR[3] == '1':
             Br_dic['4'] = 'Client exceeded max amount of transaction'
 
+    if client_custom_BR is None:
+        Custom_BR_flag = False
+
+    else:
+        i = 1
+        for each in client_custom_BR:
+            # print(each)
+            if each == '1':
+                print('found', i)
+                Custom_BR.append('Rule{}'.format(i))
+            i = i + 1
+
     cur.execute("SELECT * FROM SuspiciousTransaction WHERE clientID=%s " % (client_ID))
     transaction = cur.fetchall()
 
     return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = client_ID
-                           ,caseId = id ,transaction=transaction, form2=search_form ,alert = totalAlert, Br_flag=Br_flag ,Br_dic=Br_dic)
+                           ,caseId = id ,transaction=transaction, form2=search_form ,alert = totalAlert, Br_flag=Br_flag ,Br_dic=Br_dic,Custom_BR_flag=Custom_BR_flag,Custom_BR=Custom_BR)
 
 
 @app.route('/download/<id>', methods=['GET','POST'])
@@ -1025,6 +1070,26 @@ def Report(id):
 
 
 
+@app.route('/BussinseRuleGuide', methods=['GET','POST'])
+def BR_GUIDE():
+
+    if session.get('username') == None:
+        return redirect(url_for('home'))
+
+    search_form = SearchForm()
+    # alert code
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+    return render_template('BussinseRuleGuide.html',form2=search_form ,alert = totalAlert)
+
+
+
+
 ######CELERY PART #########
 
 @app.route('/startAnalysis')
@@ -1042,11 +1107,11 @@ def enqueue():
     totalAlert = len(totalAlert)
     print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
-
     return render_template('analysisView.html', JOBID=task.id, form2=form2 , alert = totalAlert)
 
 
 @app.route('/analysisView')
+@register_breadcrumb(app, '.manageBankData.analysisView', 'Analysis')
 def analysisView():
     form2 =SearchForm()
     cur, db, engine = connection2()
@@ -1056,8 +1121,8 @@ def analysisView():
     totalAlert = len(totalAlert)
     print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
+    return render_template("analysisView.html",form2= form2 , alert = totalAlert )
 
-    return render_template("analysisView.html",form2= form2 , alert = totalAlert)
 
 
 @app.route('/progress')
@@ -1082,9 +1147,9 @@ def progress():
     return '{}'
 
 @celery.task
-def Analysis():
+def Analysis(id):
     d = Detection()
-    d.Detect()
+    d.Detect(id)
 
 if __name__ == "__main__":
     app.run(debug =True)

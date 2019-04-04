@@ -256,5 +256,3 @@ class GeneralSearch:
         cur.close()
         db.close()
         return SearchClass, clientClass
-
-

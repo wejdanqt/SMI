@@ -4,24 +4,37 @@ from DBconnection import connection2
 from datetime import datetime
 from MachineLearningLayer.GeneralSearch import GeneralSearch
 from MachineLearningLayer.MultiCriteria import MultiCriteria
+from MachineLearningLayer.NewMultiCriteria import NewMultiCriteria
 
 
 class Detection:
 
-    def Detect(self):
+    def Detect(self, businessRule_ID):
 
         cur1, db1, engine1 = connection2() #SMI_DB
 
         status, cur2, db2, engine2 = BankConnection() #bank_DB
 
+        self.businessRule_ID = businessRule_ID #0 from template , 1 bank uplaoded their rules
+
         '''Firebase'''
         firebase = firebaseConnection()
         db = firebase.database()
 
-        self.risk_countries = db.child('Rule1').child('highRiskCountries').get().val()
-        self.sanction_list = db.child('Rule4').child('blackList').get().val()
-        self.exceed_avg_tran = db.child('Rule2').child('exceedingAvgTransaction').get().val()
-        self.amount = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+        if self.businessRule_ID  == 0: #from template
+            self.risk_countries = db.child('Rule1').child('highRiskCountries').get().val()
+            self.sanction_list = db.child('Rule4').child('blackList').get().val()
+            self.exceed_avg_tran = db.child('Rule2').child('exceedingAvgTransaction').get().val()
+            self.amount = db.child('Rule3').child('suspiciousTransaction').child('amount').get().val()
+
+        if self.businessRule_ID == 1: # from bank file
+            self.Rules = db.child('Rules').get().val()
+            self.sanctionList = db.child('sanctionList').get().val()
+            self.highRiskCountries = db.child('highRiskCountries').get().val()
+            self.MultiLevelRules = db.child('MultiLevelRules').get().val()
+
+
+
 
         '''df = pd.read_csv('GeneratedDataset.csv')
         df.to_sql(name='transaction', con=engine2, if_exists='append',
@@ -39,7 +52,7 @@ class Detection:
         cur2.close()
         db2.close()
 
-        #get client how flagged suspious transactions
+        #get client who flagged suspious transactions
         cur1.execute('SELECT clientName FROM SMI_DB.SuspiciousTransaction')
         suspsuoiusClient = list(set(list(cur1.fetchall())))
 
@@ -60,8 +73,15 @@ class Detection:
             NumberOfRecord = 0
             weightTree = 0.5
 
-            mc = MultiCriteria()
-            mc_class = mc.multi_criteria(id,self.risk_countries,self.sanction_list,self.exceed_avg_tran,self.amount)
+            if self.businessRule_ID == 0:  # from template
+                mc = MultiCriteria()
+                mc_class = mc.multi_criteria(id,self.risk_countries,self.sanction_list,self.exceed_avg_tran,self.amount)
+
+            if self.businessRule_ID == 1: #from bank file
+                mc = NewMultiCriteria()
+                mc_class = mc.getRules(self.Rules, self.sanctionList, self.highRiskCountries, self.MultiLevelRules, id)
+                print('mc_class',mc_class)
+                print('mc_class type', type(mc_class))
 
             # If the client has any suspsuoius transaction run general search
             if any(name in s for s in suspsuoiusClient):
@@ -130,4 +150,4 @@ class Detection:
         print('Number of High clients:', numOfHigh)
 
 #a = Detection()
-#a.Detect()
+#a.Detect(1)
