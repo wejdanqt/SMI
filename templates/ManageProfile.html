@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> SMI | Manage Profile</title>
+  <title> SMI | Edit Profile</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
@@ -235,27 +235,40 @@
 
              <li class="treeview">
           <a href="#">
-            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <i class="fa fa-gear"></i> <span>Analysis Setup</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li><a href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
+           <li> <a  href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
             <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
 
           </ul>
         </li>
         <li>
-          <a href="{{ url_for('manageProfile') }}">
-          <span>Manage Profile</span>
+          <a href="{{ url_for('manageProfile') }}" >
+               <i class="fa fa-edit"></i>
+          <span>Edit Profile</span>
           </a>
         </li>
 
 
           <li>
            <a href="{{ url_for('cases') }}">
+                 <i class="fa fa-folder-open"></i>
           <span>View Cases</span>
+            <span class="pull-right-container">
+
+            </span>
+          </a>
+        </li>
+
+
+              <li>
+           <a href="{{ url_for('BR_GUIDE') }}">
+                 <i class="fa fa-file-code-o"></i>
+          <span>Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>
@@ -295,7 +308,7 @@
 
 
 
-    <h1>Manage Profile</h1>
+    <h1></h1>
 	<div class="row">
       <!-- left column -->
 

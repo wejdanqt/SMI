@@ -236,7 +236,7 @@
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
-    <aside class="main-sidebar">
+     <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
@@ -272,27 +272,40 @@
 
              <li class="treeview">
           <a href="#">
-            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <i class="fa fa-gear"></i> <span>Analysis Setup</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li><a href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
+           <li> <a  href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
             <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
 
           </ul>
         </li>
         <li>
-          <a href="{{ url_for('manageProfile') }}">
-          <span>Manage Profile</span>
+          <a href="{{ url_for('manageProfile') }}" >
+               <i class="fa fa-edit"></i>
+          <span>Edit Profile</span>
           </a>
         </li>
 
 
           <li>
            <a href="{{ url_for('cases') }}">
+                 <i class="fa fa-folder-open"></i>
           <span>View Cases</span>
+            <span class="pull-right-container">
+
+            </span>
+          </a>
+        </li>
+
+
+              <li>
+           <a href="{{ url_for('BR_GUIDE') }}">
+                 <i class="fa fa-file-code-o"></i>
+          <span>Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>

@@ -67,7 +67,7 @@ class clientForm(FlaskForm):
    clientName = StringField('Client Name')
    clientClass = IntegerField('client class')
    clientID = IntegerField('Client ID')
-   clientSalary = FloatField('Client Salary')
+
 
 
 

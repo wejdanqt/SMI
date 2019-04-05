@@ -292,13 +292,22 @@ def clientProfile(id):
         query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"
 
         cur.execute(query)
-        record = cur.fetchall()
+        record1 = cur.fetchall()
         result=[]
-        for column in record:
+        profileLabel = ''
+
+        for column in record1:
             client_form.clientID.data = column[0] #clientID
             client_form.clientName.data = column[1] #clientName
-            client_form.clientSalary.data = column[2] #clientSalary
-            client_form.clientClass.data = column[3]  #clientClass
+
+
+            if column[2] == 'Medium':  # Meduim
+                profileLabel = 'label label-warning'
+            elif column[2] == 'High':  # High
+                profileLabel = 'label label-danger'
+            else: # Low
+                profileLabel = 'label label-primary'
+
 
         #Retreive old comments
         if type(id) == str:
@@ -359,12 +368,12 @@ def clientProfile(id):
 
 
         return render_template("clientProfile.html", clientForm = client_form, commentForm = new_comment , record = record ,
-                               oldCommentForm=old_comment , form2=search_form , alert = totalAlert)
+                               record1 = record1,label = profileLabel , oldCommentForm=old_comment , form2=search_form , alert = totalAlert)
 
 
 
 @app.route("/ManageProfile", methods=['GET', 'POST'])
-@register_breadcrumb(app, '.manageProfile', 'Manage Profile')
+@register_breadcrumb(app, '.manageProfile', 'Edit Profile')
 def manageProfile():
     form = bankProfileForm()
     search_form = SearchForm()
@@ -728,6 +737,7 @@ def cases():
 #case page
 
 @app.route("/case/<id>", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.cases.case', 'Case')
 def case(id):
     # Only logged in users can access bank profile
 
