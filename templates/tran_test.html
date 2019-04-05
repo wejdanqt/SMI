@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+<script>
+
+    var arrLang ={
+
+        'en' : {
+            'home': 'Home',
+            'about': 'About',
+            'contact': 'Contact Us'
+        },
+        'ar' : {
+             'home': 'الصفحة الرئيسية',
+            'about': 'عنا',
+            'contact': 'اتصل بنا'
+
+        }
+    };
+
+    $(function () {
+        $('.translate').click(function () {
+            var lang = $(this).attr('id');
+            $('.lang').each(function (index , element) {
+
+                $(this).text(arrLang[lang][$(this).attr('key')]);
+
+            });
+
+        });
+
+    });
+
+</script>
+
+
+
+</head>
+<body>
+<button class="translate" id ="en" >English</button>
+<button class="translate" id ="ar" >Arabic</button>
+
+<ul>
+
+
+    <li class="lang" key="home" > Home</li>
+     <li class="lang" key="about" > about</li>
+     <li class="lang" key="contact" > Contact us</li>
+</ul>
+
+</body>
+</html>

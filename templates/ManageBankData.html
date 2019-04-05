@@ -25,6 +25,10 @@
    <link href="{{ url_for('static', filename='multiselect.css') }}" rel="stylesheet">
 
 
+<script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+
+
+
 
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -194,6 +198,15 @@
                      <a> <div class="text-center" id="google_translate_element"></div></a>
                  </li> -->
 
+        <li>
+
+            <a class="translate" id ="en" >English</a>
+
+        </li>
+        <li>
+            <a class="translate" id ="ar" >Arabic</a>
+        </li>
+
           <li>
                   <a id = 'log' onclick="myFunc()" ><i class="fa fa-sign-out"></i></a>
 
@@ -245,7 +258,7 @@ function myFunc() {
 
         <li>
           <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span>Home</span>
+            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
 
           </a>
         </li>
@@ -521,12 +534,54 @@ function myFunction() {
 
 
 
+
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed
        immediately after the control sidebar -->
   <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
+
+<!-- Transelate code -->
+
+<script>
+
+    var arrLang ={
+
+        'en' : {
+            'home': 'Home',
+            'about': 'About',
+            'contact': 'Contact Us'
+        },
+        'ar' : {
+             'home': 'الصفحة الرئيسية',
+            'about': 'عنا',
+            'contact': 'اتصل بنا'
+
+        }
+    };
+
+    $(function () {
+        $('.translate').click(function () {
+            var lang = $(this).attr('id');
+            $('.lang').each(function (index , element) {
+
+                $(this).text(arrLang[lang][$(this).attr('key')]);
+
+            });
+
+        });
+
+    });
+
+</script>
+
+
+
+
+
+<!-- ............ -->
+
 
  <script src="{{ url_for('static', filename='multiselect.min.js') }}"></script>
 
@@ -535,8 +590,6 @@ function myFunction() {
                                 document.multiselect('#testSelect1');
                             </script>
 
-
-<script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
 
 
 

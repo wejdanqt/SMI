@@ -13,6 +13,7 @@
     <orderEntry type="library" name="jquery-1.12.4" level="application" />
     <orderEntry type="library" name="jquery-latest" level="application" />
     <orderEntry type="library" name="socket.io" level="application" />
+    <orderEntry type="library" name="2780-4-ynnnnnynn" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
