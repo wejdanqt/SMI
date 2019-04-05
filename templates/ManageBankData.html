@@ -8,6 +8,7 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
 
+
   <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
 
   <!-- Font Awesome -->
@@ -22,11 +23,11 @@
        folder instead of downloading all of them to reduce the load. -->
   <link href="{{ url_for('static', filename='dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
 
+
    <link href="{{ url_for('static', filename='multiselect.css') }}" rel="stylesheet">
 
 
-<script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
-
+     <script src="{{ url_for('static', filename='multiselect.min.js') }}"></script>
 
 
 
@@ -239,7 +240,7 @@ function myFunc() {
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
+           <a> <i class="fa fa-search"></i> <span class="lang" key="search" >Search For Client</span>
               </a>
                 <!-- search form -->
               <form action="#" method="post" class="sidebar-form" role="form">
@@ -266,21 +267,21 @@ function myFunc() {
 
              <li class="treeview">
           <a href="#">
-            <i class="fa fa-gear"></i> <span>Analysis Setup</span>
+            <i class="fa fa-gear"></i> <span class="lang" key="set">Settings</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li> <a  href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
-            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
+           <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
+            <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
 
           </ul>
         </li>
         <li>
           <a href="{{ url_for('manageProfile') }}" >
                <i class="fa fa-edit"></i>
-          <span>Edit Profile</span>
+          <span class="lang" key="edit">Edit Profile</span>
           </a>
         </li>
 
@@ -288,7 +289,7 @@ function myFunc() {
           <li>
            <a href="{{ url_for('cases') }}">
                  <i class="fa fa-folder-open"></i>
-          <span>View Cases</span>
+          <span class="lang" key="view">View Cases</span>
             <span class="pull-right-container">
 
             </span>
@@ -299,7 +300,7 @@ function myFunc() {
               <li>
            <a href="{{ url_for('BR_GUIDE') }}">
                  <i class="fa fa-file-code-o"></i>
-          <span>Business Rules Guide</span>
+          <span class="lang" key="guide">Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>
@@ -407,6 +408,14 @@ function myFunc() {
 
 
                             <!-- JavaScript for Multi Select -->
+
+
+
+
+                            <script>
+                                document.multiselect('#testSelect1');
+                            </script>
+
 
                             <!-- ..................... -->
                     </div>
@@ -521,7 +530,7 @@ function myFunction() {
       <!-- Content Wrapper. Contains page content -->
 
 
-
+    <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
 
 
 
@@ -544,19 +553,32 @@ function myFunction() {
 
 <!-- Transelate code -->
 
+
+
 <script>
 
     var arrLang ={
 
         'en' : {
             'home': 'Home',
-            'about': 'About',
-            'contact': 'Contact Us'
+            'search': 'Search For Client',
+            'edit': 'Edit Profile',
+            'view': 'View Cases',
+            'guide': 'Business Rules Guide',
+            'set': 'Settings',
+            'data': 'Database Setup',
+            'bus': 'Business Rules Setup'
+
         },
         'ar' : {
              'home': 'الصفحة الرئيسية',
-            'about': 'عنا',
-            'contact': 'اتصل بنا'
+            'search': 'البحث عن عميل',
+            'edit': 'تعديل الملف الشخصي',
+            'view': 'عرض القضايا',
+            'guide': 'دليل كتابة اللوائج',
+             'set': 'إعدادات',
+            'data': 'إعدادت قاعدة البيانات',
+            'bus': 'إعدادات اللوائح'
 
         }
     };
@@ -583,12 +605,6 @@ function myFunction() {
 <!-- ............ -->
 
 
- <script src="{{ url_for('static', filename='multiselect.min.js') }}"></script>
-
-
-                            <script>
-                                document.multiselect('#testSelect1');
-                            </script>
 
 
 
