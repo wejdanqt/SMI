@@ -245,6 +245,7 @@ def searchResult(id):
         query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"
         cur.execute(query)
         data = cur.fetchall()
+        print(len(data))
         form = ViewProfileForm()
         search_form = SearchForm()
 
@@ -259,9 +260,11 @@ def searchResult(id):
             return redirect((url_for('clientProfile', id = id  , form = form )))
 
         if search_form.search_submit.data and search_form.validate_on_submit():
-            return redirect((url_for('searchResult', id=search_form.search.data , form2 = search_form , alert = totalAlert)))
+            return redirect((url_for('searchResult', id=search_form.search.data , form2 = search_form ,
+                                     alert = totalAlert , NoResult = len(data) )))
 
-        return render_template("searchResult.html", data=data, form=form , form2 = search_form , alert = totalAlert)
+        return render_template("searchResult.html", data=data, form=form , form2 = search_form ,
+                               alert = totalAlert , NoResult = len(data) )
 
 
 
