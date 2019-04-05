@@ -213,7 +213,7 @@
               <div class="input-group">
                    {{ form.search( class="form-control")  }}
 
-                        {{ form.search_submit(class="btn btn-primary btn-block btn-flat input-group-btn") }}
+                        {{ form.search_submit() }}
                         <!-- <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                       </button> -->
               </div>
@@ -230,31 +230,42 @@
         </li>
 
 
-           <li class="treeview">
+             <li class="treeview">
           <a href="#">
-            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <i class="fa fa-gear"></i> <span>Analysis Setup</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li><a href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
+           <li> <a  href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
             <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
 
           </ul>
         </li>
-
         <li>
-          <a href="{{ url_for('manageProfile') }}">
-          <span>Manage Profile</span>
+          <a href="{{ url_for('manageProfile') }}" >
+               <i class="fa fa-edit"></i>
+          <span>Edit Profile</span>
           </a>
         </li>
 
 
-
           <li>
            <a href="{{ url_for('cases') }}">
+                 <i class="fa fa-folder-open"></i>
           <span>View Cases</span>
+            <span class="pull-right-container">
+
+            </span>
+          </a>
+        </li>
+
+
+              <li>
+           <a href="{{ url_for('BR_GUIDE') }}">
+                 <i class="fa fa-file-code-o"></i>
+          <span>Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>
@@ -265,7 +276,6 @@
     </section>
     <!-- /.sidebar -->
   </aside>
-
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
