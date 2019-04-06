@@ -142,12 +142,13 @@ def keyword():
 
         keywords = open("key_words/" + filename, "r")
 
+        # query = "INSERT INTO SMI_DB.KeyWords (wordID, word) VALUES (%s , %s)"
+        # key = keywords.read().splitlines()
+        # val = (100 ,key)
+
         query = "LOAD DATA LOCAL INFILE 'filename' INTO TABLE KeyWords;"
         cur.execute(query)
 
-        #query = "INSERT INTO SMI_DB.KeyWords (wordID, word) VALUES (%s , %s)"
-        #key = keywords.read().splitlines()
-        #val = (100 ,key)
 
 
 
