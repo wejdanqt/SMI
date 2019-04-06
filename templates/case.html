@@ -23,6 +23,8 @@
        folder instead of downloading all of them to reduce the load. -->
       <link href="{{ url_for('static', filename='dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
 
+    <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -38,7 +40,7 @@
 
  <header class="main-header">
     <!-- Logo -->
-    <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
+    <a  class="logo" style="background-color:#0f5757;">
       <!-- mini logo for sidebar mini 50x50 pixels -->
            <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
@@ -122,9 +124,31 @@
             </ul>
           </li>
           <!-- Control Sidebar Toggle Button -->
-          <li>
-            <a href="#"><i class="fa fa-sign-out"></i></a>
+
+           <li>
+
+            <a class="translate" id ="en"  >English</a>
+
+        </li>
+        <li>
+            <a class="translate" id ="ar" >Arabic</a>
+        </li>
+            <li>
+                  <a id = 'log' onclick="myFunc()" ><i class="fa fa-sign-out"></i></a>
+
+
           </li>
+
+        <script>
+function myFunc() {
+  var r = confirm("Are you sure you want to logout?");
+  if (r === true) {
+      var a = document.getElementById('log');
+      a.href = "/logout"
+  }
+}
+</script>
+
         </ul>
       </div>
     </nav>
@@ -139,7 +163,7 @@
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
+           <a> <i class="fa fa-search"></i> <span class="lang" key="search" >Search For Client</span>
               </a>
                 <!-- search form -->
               <form action="#" method="post" class="sidebar-form" role="form">
@@ -158,7 +182,7 @@
 
         <li>
           <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span>Home</span>
+            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
 
           </a>
         </li>
@@ -166,21 +190,21 @@
 
              <li class="treeview">
           <a href="#">
-            <i class="fa fa-gear"></i> <span>Analysis Setup</span>
+            <i class="fa fa-gear"></i> <span class="lang" key="set">Settings</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li> <a  href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
-            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
+           <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
+            <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
 
           </ul>
         </li>
         <li>
           <a href="{{ url_for('manageProfile') }}" >
                <i class="fa fa-edit"></i>
-          <span>Edit Profile</span>
+          <span class="lang" key="edit">Edit Profile</span>
           </a>
         </li>
 
@@ -188,7 +212,7 @@
           <li>
            <a href="{{ url_for('cases') }}">
                  <i class="fa fa-folder-open"></i>
-          <span>View Cases</span>
+          <span class="lang" key="view">View Cases</span>
             <span class="pull-right-container">
 
             </span>
@@ -199,7 +223,7 @@
               <li>
            <a href="{{ url_for('BR_GUIDE') }}">
                  <i class="fa fa-file-code-o"></i>
-          <span>Business Rules Guide</span>
+          <span class="lang" key="guide">Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>
@@ -389,9 +413,6 @@
                </div>
 
 
-
-
-
             </div>
             <!-- /.box-body -->
           </div>
@@ -408,12 +429,66 @@
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed
        immediately after the control sidebar -->
-  <div class="control-sidebar-bg"></div>
-</div>
+
+
 <!-- ./wrapper -->
 
+<!-- Transelate code -->
 
-<script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+
+
+<script>
+
+    var arrLang ={
+
+        'en' : {
+            'home': 'Home',
+            'search': 'Search For Client',
+            'edit': 'Edit Profile',
+            'view': 'View Cases',
+            'guide': 'Business Rules Guide',
+            'set': 'Settings',
+            'data': 'Database Setup',
+            'bus': 'Business Rules Setup'
+
+        },
+        'ar' : {
+             'home': 'الصفحة الرئيسية',
+            'search': 'البحث عن عميل',
+            'edit': 'تعديل الملف الشخصي',
+            'view': 'عرض القضايا',
+            'guide': 'دليل كتابة اللوائح',
+             'set': 'إعدادات',
+            'data': 'إعدادت قاعدة البيانات',
+            'bus': 'إعدادات اللوائح'
+
+        }
+    };
+
+    $(function () {
+        $('.translate').click(function () {
+            var lang = $(this).attr('id');
+            $('.lang').each(function (index , element) {
+
+                $(this).text(arrLang[lang][$(this).attr('key')]);
+
+            });
+
+        });
+
+    });
+
+</script>
+
+
+
+
+
+<!-- ............ -->
+
+
+
+
 
 
 

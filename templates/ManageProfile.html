@@ -29,69 +29,6 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-    <!-- Google Translate Element begin -->
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en', includedLanguages: 'en,ar',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-            }, 'google_translate_element');
-        }
-    </script>
-
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <style type="text/css">
-        /* OVERRIDE GOOGLE TRANSLATE WIDGET CSS BEGIN */
-        div#google_translate_element div.goog-te-gadget-simple {
-            border: none;
-            background-color: transparent;
-            /*background-color: #17548d;*/ /*#e3e3ff*/
-        }
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value:hover {
-            text-decoration: none;
-        }
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span {
-            color: #aaa;
-        }
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span:hover {
-            color: white;
-        }
-        .goog-te-gadget-icon {
-            display: none !important;
-            /*background: url("url for the icon") 0 0 no-repeat !important;*/
-        }
-        /* Remove the down arrow */
-        /* when dropdown open */
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span[style="color: rgb(213, 213, 213);"] {
-            display: none;
-        }
-        /* after clicked/touched */
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span[style="color: rgb(118, 118, 118);"] {
-            display: none;
-        }
-        /* on page load (not yet touched or clicked) */
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span[style="color: rgb(155, 155, 155);"] {
-            display: none;
-        }
-        /* Remove span with left border line | (next to the arrow) in Chrome & Firefox */
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span[style="border-left: 1px solid rgb(187, 187, 187);"] {
-            display: none;
-        }
-        /* Remove span with left border line | (next to the arrow) in Edge & IE11 */
-        div#google_translate_element div.goog-te-gadget-simple a.goog-te-menu-value span[style="border-left-color: rgb(187, 187, 187); border-left-width: 1px; border-left-style: solid;"] {
-            display: none;
-        }
-        /* HIDE the google translate toolbar */
-        .goog-te-banner-frame.skiptranslate {
-            display: none !important;
-        }
-        body {
-            top: 0px !important;
-        }
-        /* OVERRIDE GOOGLE TRANSLATE WIDGET CSS END */
-    </style>
-               <!-- End Translation code -->
-
 
 
   <!-- Google Font -->
@@ -103,10 +40,12 @@
 
         <header class="main-header">
           <!-- Logo -->
-          <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
-            <!-- mini logo for sidebar mini 50x50 pixels -->
+          <a class="logo" style="background-color:#0f5757;">
+             <!-- mini logo for sidebar mini 50x50 pixels -->
+           <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
+
       <!-- logo for regular state and mobile devices -->
-           <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
+     <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
 
     </a>
           <!-- Header Navbar: style can be found in header.less -->
@@ -186,20 +125,38 @@
                   </ul>
                 </li>
                 <!-- Control Sidebar Toggle Button -->
-                      <li>
-                     <a> <div class="text-center" id="google_translate_element"></div></a>
-                 </li>
 
                 <li>
-                  <a href="{{ url_for('logout') }}"><i class="fa fa-sign-out"></i></a>
-                </li>
+
+            <a class="translate" id ="en"  >English</a>
+
+        </li>
+        <li>
+            <a class="translate" id ="ar" >Arabic</a>
+        </li>
+
+                  <li>
+                  <a id = 'log' onclick="myFunc()" ><i class="fa fa-sign-out"></i></a>
+
+
+          </li>
+
+        <script>
+function myFunc() {
+  var r = confirm("Are you sure you want to logout?");
+  if (r === true) {
+      var a = document.getElementById('log');
+      a.href = "/logout"
+  }
+}
+</script>
 
               </ul>
             </div>
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
-    <aside class="main-sidebar">
+  <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
@@ -208,7 +165,7 @@
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
+           <a> <i class="fa fa-search"></i> <span class="lang" key="search" >Search For Client</span>
               </a>
                 <!-- search form -->
               <form action="#" method="post" class="sidebar-form" role="form">
@@ -227,7 +184,7 @@
 
         <li>
           <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span>Home</span>
+            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
 
           </a>
         </li>
@@ -235,21 +192,21 @@
 
              <li class="treeview">
           <a href="#">
-            <i class="fa fa-gear"></i> <span>Analysis Setup</span>
+            <i class="fa fa-gear"></i> <span class="lang" key="set">Settings</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li> <a  href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
-            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
+           <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
+            <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
 
           </ul>
         </li>
         <li>
           <a href="{{ url_for('manageProfile') }}" >
                <i class="fa fa-edit"></i>
-          <span>Edit Profile</span>
+          <span class="lang" key="edit">Edit Profile</span>
           </a>
         </li>
 
@@ -257,7 +214,7 @@
           <li>
            <a href="{{ url_for('cases') }}">
                  <i class="fa fa-folder-open"></i>
-          <span>View Cases</span>
+          <span class="lang" key="view">View Cases</span>
             <span class="pull-right-container">
 
             </span>
@@ -268,7 +225,7 @@
               <li>
            <a href="{{ url_for('BR_GUIDE') }}">
                  <i class="fa fa-file-code-o"></i>
-          <span>Business Rules Guide</span>
+          <span class="lang" key="guide">Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>
@@ -285,7 +242,7 @@
 
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
+                <div class="alert alert-{{ category }}" style="opacity: 0.6;">
                 {{ message }}
                 </div>
 
@@ -457,6 +414,60 @@ function myFunction() {
   <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
+
+
+      <!-- Transelate code -->
+
+
+
+<script>
+
+    var arrLang ={
+
+        'en' : {
+            'home': 'Home',
+            'search': 'Search For Client',
+            'edit': 'Edit Profile',
+            'view': 'View Cases',
+            'guide': 'Business Rules Guide',
+            'set': 'Settings',
+            'data': 'Database Setup',
+            'bus': 'Business Rules Setup'
+
+        },
+        'ar' : {
+             'home': 'الصفحة الرئيسية',
+            'search': 'البحث عن عميل',
+            'edit': 'تعديل الملف الشخصي',
+            'view': 'عرض القضايا',
+            'guide': 'دليل كتابة اللوائح',
+             'set': 'إعدادات',
+            'data': 'إعدادت قاعدة البيانات',
+            'bus': 'إعدادات اللوائح'
+
+        }
+    };
+
+    $(function () {
+        $('.translate').click(function () {
+            var lang = $(this).attr('id');
+            $('.lang').each(function (index , element) {
+
+                $(this).text(arrLang[lang][$(this).attr('key')]);
+
+            });
+
+        });
+
+    });
+
+</script>
+
+
+
+
+
+<!-- ............ -->
 
 <!-- jQuery 3 -->
 

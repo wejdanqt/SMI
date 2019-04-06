@@ -1,8 +1,9 @@
 import flask
-from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response , render_template_string
+from flask import Flask, redirect, render_template, request, session, abort, url_for, flash, redirect, session,jsonify , make_response ,\
+    render_template_string , send_from_directory
 from flaskext.mysql import MySQL
 from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm ,\
-    SearchForm , ViewProfileForm , ViewCasesForm , reportCase , uploadForm
+    SearchForm , ViewProfileForm , ViewCasesForm , reportCase , uploadForm , uploadKeywords
 from DBconnection import connection2, BankConnection , firebaseConnection
 from passwordRecovery import passwordRecovery
 from datetime import datetime
@@ -95,7 +96,77 @@ firebase = firebaseConnection()
 #............
 @app.route("/")
 def home():
-    return render_template("tran_test.html")
+    return render_template("home.html")
+
+
+@app.route("/keyword", methods=['GET', 'POST'])
+def keyword():
+    # Only logged in users can access bank profile
+    if session.get('username') == None:
+        return redirect(url_for('home'))
+
+     # alert code
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+    search_form = SearchForm()
+    form3 = uploadKeywords()
+
+    # upload BR
+    if form3.submit.data and form3.validate_on_submit():
+        print('iam in keywords')
+
+        target = os.path.join(APP_ROOT, 'key_words/')
+        # print(target)
+        if not os.path.isdir(target):
+            os.mkdir(target)
+
+        file = request.files.get('file_br')
+        filename = file.filename
+        print(filename)
+
+        if filename.split(".", 1)[1] != 'txt':
+            flash('File extention should be txt', 'danger')
+            return render_template("keyword.html", form2=search_form,
+                                   form3=form3, alert=totalAlert)
+
+        else:
+            dest = "/".join([target, filename])
+            print(dest)
+            file.save(dest)
+
+        keywords = open("key_words/" + filename, "r")
+
+        query = "LOAD DATA LOCAL INFILE 'filename' INTO TABLE KeyWords;"
+        cur.execute(query)
+
+        #query = "INSERT INTO SMI_DB.KeyWords (wordID, word) VALUES (%s , %s)"
+        #key = keywords.read().splitlines()
+        #val = (100 ,key)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3= form3 , alert = totalAlert)))
+
+    return render_template("keyword.html" ,  form2=search_form , form3 = form3 , alert = totalAlert)
 
 
 
@@ -171,8 +242,8 @@ def register():
             return render_template('Register.html', form=form)
         else:
             cur, db , engine = connection2()
-            query = "INSERT INTO AMLOfficer (userName, email, fullname, password) VALUES(%s,%s,%s,%s)"
-            val = (form.username.data, form.email.data, form.fullName.data, form.password.data)
+            query = "INSERT INTO AMLOfficer (userName, email, fullname, password , bankName) VALUES(%s,%s,%s,%s,%s)"
+            val = (form.username.data, form.email.data, form.fullName.data, form.password.data , form.bankName.data)
             cur.execute(query, val)
             db.commit()
             cur.close()
@@ -214,6 +285,10 @@ def bankP():
     if session.get('username') == None:
         return redirect(url_for('home'))
     username = session.get('username')
+
+    cursor.execute("SELECT * FROM AMLOfficer WHERE userName = '" + username + "'")
+    data1 = cursor.fetchall()
+
     cur, db, engine = connection2()
     query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
     cur.execute(query)
@@ -223,13 +298,9 @@ def bankP():
     socketio.emit('count-update', {'count': totalAlert})
     form = SearchForm()
 
-    '''query1 = "SELECT email FROM SMI_DB.AMLOfficer WHERE userName = '" + username + "'"
-    cur.execute(query1)
-    email = cur.fetchall()'''
-
     if form.validate_on_submit():
         return redirect((url_for('searchResult', id= form.search.data)))  # or what you want
-    return render_template("bankProfile.html", form = form, alert = totalAlert )
+    return render_template("bankProfile.html", form = form, alert = totalAlert , data = data1)
 
 
 
@@ -477,7 +548,7 @@ def manageBankData():
     print(form.validate_on_submit())
 
     if form.bank_submit.data and form.validate_on_submit():
-        print('why')
+
         ## check if there's prevoius BR and confirm to update it
         #print()
         target = os.path.join(APP_ROOT, 'br_file/')
@@ -1053,34 +1124,42 @@ def Report(id):
 
     #######save case to working dierctory ##########
     pdfFile = pdfkit.from_string(rendered, 'case.pdf')
-    #request.files.get('file_case') = pdfFile
-    #request.form['file_case'] = pdfFile
+
     form.subject.data = 'Case#{}_{}'.format(id,clientName)
     form.email_body.data = 'Fruad Report'
 
     if form.validate_on_submit():
-        '''target = os.path.join(APP_ROOT, 'Case_file/')
+
+        target = os.path.join(APP_ROOT, 'Case_file/')
         print('target',target)
         if not os.path.isdir(target):
             os.mkdir(target)
         file = request.files.get('file_case')
-        print('file',file)
-        filename = file.filename
-        print('fileNAME',filename)
-        dest = "/".join([target, filename])
-        print(dest)
-        file.save(dest)'''
+        try:
+            filename = file.filename
+            print('fileNAME',filename)
+            dest = "/".join([target, filename])
+            print(dest)
+            file.save(dest)
+            fileType= filename.split(".")[0]+"/"+filename.split(".")[1]
+            filename = 'Case_file/'+filename
+        except Exception as e:
+            filename= "case.pdf"
+            fileType = "case/pdf"
+
+
+
+
         recipient = form.reciver.data
         msg = Message(form.subject.data, recipient.split())
         msg.body = form.email_body.data
-        with app.open_resource("case.pdf") as fp:
-            msg.attach("case.pdf", "case/pdf", fp.read())
+        with app.open_resource(filename) as fp:
+            msg.attach(filename, fileType, fp.read())
         print(msg)
         mail.send(msg)
 
         flash('Email has been sent Successfully..', 'success')
     return render_template("email.html", form = form, clientID= id , alert = totalAlert , form2=search_form )
-
 
 
 @app.route('/BussinseRuleGuide', methods=['GET','POST'])
@@ -1101,6 +1180,18 @@ def BR_GUIDE():
     return render_template('BussinseRuleGuide.html',form2=search_form ,alert = totalAlert)
 
 
+
+@app.route('/return-file/')
+def return_file():
+   ''' with open("BR_Sample/BussinseRulesSample.json") as fp:
+         content = fp.read()
+    response = make_response(content)
+    response.headers['Content-Type'] = 'application/json'
+    response.headers['Content-Disposition'] = 'attachment; filename=BussinseRulesSample'
+    return response'''
+
+   return send_from_directory('BR_Sample/', 'BussinseRulesSample.json', as_attachment=True, mimetype='application/json',
+                       attachment_filename='BussinseRulesSample.json')
 
 
 ######CELERY PART #########

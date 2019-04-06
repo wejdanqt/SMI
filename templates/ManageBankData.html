@@ -109,7 +109,7 @@
 
   <header class="main-header">
     <!-- Logo -->
-    <a href="../../index2.html" class="logo" style="background-color:#0f5757;">
+    <a class="logo" style="background-color:#0f5757;">
       <!-- mini logo for sidebar mini 50x50 pixels -->
            <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
@@ -201,7 +201,7 @@
 
         <li>
 
-            <a class="translate" id ="en" >English</a>
+            <a class="translate" id ="en"  >English</a>
 
         </li>
         <li>
@@ -263,7 +263,12 @@ function myFunc() {
 
           </a>
         </li>
+         <li>
+          <a href="{{ url_for('bankP') }}">
+            <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
+          </a>
+        </li>
 
              <li class="treeview">
           <a href="#">
@@ -275,6 +280,7 @@ function myFunc() {
           <ul class="treeview-menu">
            <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
             <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
+              <li><a class="lang" key="keyword" href="{{ url_for('keyword') }}">Keywords Setup</a></li>
 
           </ul>
         </li>
@@ -319,7 +325,7 @@ function myFunc() {
 
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}"  style="font-size:125%;">
+                <div class="alert alert-{{ category }}" style="opacity: 0.6;">
                 {{ message }}
                 </div>
 
@@ -567,7 +573,12 @@ function myFunction() {
             'guide': 'Business Rules Guide',
             'set': 'Settings',
             'data': 'Database Setup',
-            'bus': 'Business Rules Setup'
+            'bus': 'Business Rules Setup',
+            'profile': 'Profile',
+            'keyword': 'Keywords Setup'
+
+
+
 
         },
         'ar' : {
@@ -575,10 +586,12 @@ function myFunction() {
             'search': 'البحث عن عميل',
             'edit': 'تعديل الملف الشخصي',
             'view': 'عرض القضايا',
-            'guide': 'دليل كتابة اللوائج',
+            'guide': 'دليل كتابة اللوائح',
              'set': 'إعدادات',
-            'data': 'إعدادت قاعدة البيانات',
-            'bus': 'إعدادات اللوائح'
+            'data': 'إعدادات قاعدة البيانات',
+            'bus': 'إعدادات اللوائح',
+            'profile': 'الملف الشخصي',
+            'keyword': 'إعدادات كلمات البحث'
 
         }
     };

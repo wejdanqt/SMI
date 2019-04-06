@@ -28,6 +28,7 @@ class ViewCasesForm(FlaskForm):
 class RegistrationForm(FlaskForm):
    fullName = StringField('Full Name', validators=[DataRequired()])
    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+   bankName = StringField('Bank Name', validators=[DataRequired()])
    email = StringField('Email', validators= [DataRequired(), Email()])
    password = PasswordField('Password', validators= [DataRequired(), Length(min=8)])
    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
@@ -92,6 +93,12 @@ class dbSetupForm(FlaskForm):
 class uploadForm(FlaskForm):
     businessRules_file = FileField('Upload Business Rules:')
     submitRule = SubmitField('Upload')
+
+
+class uploadKeywords(FlaskForm):
+    businessRules_file = FileField('Upload Keywords:')
+    submit = SubmitField('Upload')
+
 
 
 
