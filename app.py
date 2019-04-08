@@ -883,9 +883,12 @@ def download(id):
      clientName = each[1]
 
     client_BR = record2[0][5]
+    client_custom_BR = record2[0][6]
     Br_flag = True
+    Custom_BR_flag = True
     print('Br', client_BR)
     Br_dic = {}
+    Custom_BR = []
     if client_BR == '0000':
         Br_flag = False
     else:
@@ -898,9 +901,24 @@ def download(id):
         if client_BR[3] == '1':
             Br_dic['4'] = 'Client exceeded max amount of transaction'
 
+
+
+    if client_custom_BR is None:
+        Custom_BR_flag = False
+
+    else:
+        i = 1
+        for each in client_custom_BR:
+            # print(each)
+            if each == '1':
+                print('found', i)
+                Custom_BR.append('Rule{}'.format(i))
+            i = i + 1
+
     rendered = render_template('CaseToPrint.html' , clientName = clientName , caseNumber = caseNumber
                                ,caseDate = caseDate,label = profileLabel ,label_name = label_name ,
-                               transaction = transaction ,Br_flag=Br_flag ,Br_dic=Br_dic )
+                               transaction = transaction ,Br_flag=Br_flag ,Br_dic=Br_dic  ,Custom_BR_flag=Custom_BR_flag,
+                               Custom_BR=Custom_BR )
 
     pdf = pdfkit.from_string(rendered, False)
     response = make_response(pdf)
@@ -1052,9 +1070,12 @@ def Report(id):
         clientName = each[1]
 
     client_BR = record2[0][5]
+    client_custom_BR = record2[0][6]
     Br_flag = True
+    Custom_BR_flag = True
     print('Br', client_BR)
     Br_dic = {}
+    Custom_BR = []
     if client_BR == '0000':
         Br_flag = False
     else:
@@ -1067,9 +1088,22 @@ def Report(id):
         if client_BR[3] == '1':
             Br_dic['4'] = 'Client exceeded max amount of transaction'
 
+    if client_custom_BR is None:
+        Custom_BR_flag = False
+
+    else:
+        i = 1
+        for each in client_custom_BR:
+            # print(each)
+            if each == '1':
+                print('found', i)
+                Custom_BR.append('Rule{}'.format(i))
+            i = i + 1
+
     rendered = render_template('CaseToPrint.html', clientName=clientName, caseNumber=caseNumber
                                , caseDate=caseDate, label=profileLabel, label_name=label_name,
-                               transaction=transaction , Br_flag=Br_flag ,Br_dic=Br_dic)
+                               transaction=transaction , Br_flag=Br_flag ,Br_dic=Br_dic , Custom_BR_flag=Custom_BR_flag,
+                               Custom_BR=Custom_BR)
 
     #######save case to working dierctory ##########
     pdfFile = pdfkit.from_string(rendered, 'case.pdf')
@@ -1143,6 +1177,7 @@ def return_file():
                        attachment_filename='BussinseRulesSample.json')
 
 @app.route("/keyword", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.keyword', 'Keywords')
 def keyword():
     # Only logged in users can access bank profile
     if session.get('username') == None:
