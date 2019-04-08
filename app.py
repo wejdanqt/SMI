@@ -99,77 +99,6 @@ def home():
     return render_template("home.html")
 
 
-@app.route("/keyword", methods=['GET', 'POST'])
-def keyword():
-    # Only logged in users can access bank profile
-    if session.get('username') == None:
-        return redirect(url_for('home'))
-
-     # alert code
-    cur, db, engine = connection2()
-    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
-    cur.execute(query)
-    totalAlert = cur.fetchall()
-    totalAlert = len(totalAlert)
-    print(totalAlert)
-    socketio.emit('count-update', {'count': totalAlert})
-
-    search_form = SearchForm()
-    form3 = uploadKeywords()
-
-    # upload BR
-    if form3.submit.data and form3.validate_on_submit():
-        print('iam in keywords')
-
-        target = os.path.join(APP_ROOT, 'key_words/')
-        # print(target)
-        if not os.path.isdir(target):
-            os.mkdir(target)
-
-        file = request.files.get('file_br')
-        filename = file.filename
-        print(filename)
-
-        if filename.split(".", 1)[1] != 'txt':
-            flash('File extention should be txt', 'danger')
-            return render_template("keyword.html", form2=search_form,
-                                   form3=form3, alert=totalAlert)
-
-        else:
-            dest = "/".join([target, filename])
-            print(dest)
-            file.save(dest)
-
-        keywords = open("key_words/" + filename, "r")
-
-        # query = "INSERT INTO SMI_DB.KeyWords (wordID, word) VALUES (%s , %s)"
-        # key = keywords.read().splitlines()
-        # val = (100 ,key)
-
-        query = "LOAD DATA LOCAL INFILE 'filename' INTO TABLE KeyWords;"
-        cur.execute(query)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    if search_form.search_submit.data and search_form.validate_on_submit():
-        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3= form3 , alert = totalAlert)))
-
-    return render_template("keyword.html" ,  form2=search_form , form3 = form3 , alert = totalAlert)
-
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -489,6 +418,11 @@ def manageProfile():
             cur, db , engine = connection2()
             cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' , password = '" + form.password.data + "' WHERE userName = '" + username + "'" )
             db.commit()
+            flash('Profile Successfully updated', 'success')
+            return redirect(url_for('bankP'))
+
+
+
 
     # bring info from database
     cur1, db1, engine1 = connection2()
@@ -1208,6 +1142,92 @@ def return_file():
    return send_from_directory('BR_Sample/', 'BussinseRulesSample.json', as_attachment=True, mimetype='application/json',
                        attachment_filename='BussinseRulesSample.json')
 
+@app.route("/keyword", methods=['GET', 'POST'])
+def keyword():
+    # Only logged in users can access bank profile
+    if session.get('username') == None:
+        return redirect(url_for('home'))
+
+     # alert code
+    cur, db, engine = connection2()
+    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query)
+    totalAlert = cur.fetchall()
+    totalAlert = len(totalAlert)
+    print(totalAlert)
+    socketio.emit('count-update', {'count': totalAlert})
+
+    search_form = SearchForm()
+    form3 = uploadKeywords()
+    fileEx = 0
+
+    # upload BR
+    if form3.submit.data and form3.validate_on_submit():
+        print('iam in keywords')
+
+
+        target = os.path.join(APP_ROOT, 'key_words/')
+        # print(target)
+        if not os.path.isdir(target):
+            os.mkdir(target)
+
+        file = request.files.get('file_br')
+        filename = file.filename
+        print(filename)
+
+        if filename.split(".", 1)[1] != 'txt':
+            #flash('File extention should be txt', 'danger')
+            fileEx = 1
+            return render_template("keyword.html", form2=search_form,form3=form3, alert=totalAlert, fileEx=fileEx)
+
+        else:
+            dest = "/".join([target, filename])
+            print(dest)
+            file.save(dest)
+
+            cur.execute('SELECT key_word FROM SMI_DB.KeyWord')
+            data = cur.fetchall()
+            db_word = []
+            ### get old key words in database ###
+            for each in data:
+                db_word.append(each[0])
+
+            ### get key words entered by user ###
+            user_word = []
+            f = open(dest, mode="r", encoding='utf-8')
+            for line in f:
+                user_word.append(line.rstrip('\n'))
+
+            print('length of user words', len(user_word))
+
+            #### If the is empty ####
+            if len(user_word) ==0 :
+                flash('The uploaded file is empty..', 'danger')
+                return render_template("keyword.html", form2=search_form, form3=form3, alert=totalAlert, fileEx=fileEx)
+
+            #### get unique words only ####
+            new_words = set(user_word) - set(db_word)
+
+
+            ### If there's any unique Key words add it
+            if len(new_words) > 0:
+                for each in new_words:
+                    print(each)
+                    cur.execute("""INSERT INTO  SMI_DB.KeyWord (key_word) VALUES (%s)""", (each,))
+                flash('Keywords Uploaded Successfully ', 'success')
+                return render_template("keyword.html", form2=search_form, form3=form3, alert=totalAlert, fileEx=fileEx)
+
+            else :
+                flash('Keywords in the file is already in the database  ', 'success')
+                return render_template("keyword.html", form2=search_form, form3=form3, alert=totalAlert, fileEx=fileEx)
+
+
+
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3= form3 , alert = totalAlert)))
+
+    return render_template("keyword.html" ,  form2=search_form , form3 = form3 , alert = totalAlert,fileEx=fileEx)
+
 
 ######CELERY PART #########
 
@@ -1230,7 +1250,7 @@ def enqueue():
 
 
 @app.route('/analysisView')
-@register_breadcrumb(app, '.manageBankData.analysisView', 'Analysis')
+#@register_breadcrumb(app, '.manageBankData.analysisView', 'Analysis')
 def analysisView():
     form2 =SearchForm()
     cur, db, engine = connection2()

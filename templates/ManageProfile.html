@@ -283,7 +283,7 @@ function myFunc() {
       <br>
 
             <div class = "form-horizontal">
-           <form action="" id="sav" method="post"  onsubmit="return save_changes();">
+           <form action="" method="post"  onsubmit= "return confirm('Are you sure you want to save changes ?')" >
     {{ form.hidden_tag() }}
     <!-- drop down list here-->
            <!-- Full Name -->
@@ -377,20 +377,12 @@ function myFunc() {
       <div class="row">
         <!-- /.col -->
         <div class="col-xs-5" style="margin-left:40%">
-            {{ form.profile_submit(class="btn btn-primary btn-block btn-flat") }}
+            {{ form.profile_submit( class="btn btn-primary btn-block btn-flat") }}
           <br>
             <a id = 'del' class="btn btn-danger" onclick="myFunction()" style="margin-left: 33%" >Delete Account</a>
 
         </div>
 
-          <script>
-    function save_changes() {
-        var c = confirm("Are you sure you want to save changes?");
-         if (c === true) {
-          var a = document.getElementById('sav');
-          a.href = "/bankP"
-    } }
-</script>
 
 
 <script>
