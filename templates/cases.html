@@ -197,7 +197,7 @@ function myFunc() {
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
-    <aside class="main-sidebar">
+     <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
@@ -229,7 +229,12 @@ function myFunc() {
 
           </a>
         </li>
+         <li>
+          <a href="{{ url_for('bankP') }}">
+            <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
+          </a>
+        </li>
 
              <li class="treeview">
           <a href="#">
@@ -241,6 +246,7 @@ function myFunc() {
           <ul class="treeview-menu">
            <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
             <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
+              <li><a class="lang" key="keyword" href="{{ url_for('keyword') }}">Keywords Setup</a></li>
 
           </ul>
         </li>
@@ -378,8 +384,7 @@ function myFunc() {
 <!-- ./wrapper -->
 
 
-
-      <!-- Transelate code -->
+<!-- Transelate code -->
 
 
 
@@ -395,7 +400,12 @@ function myFunc() {
             'guide': 'Business Rules Guide',
             'set': 'Settings',
             'data': 'Database Setup',
-            'bus': 'Business Rules Setup'
+            'bus': 'Business Rules Setup',
+            'profile': 'Profile',
+            'keyword': 'Keywords Setup'
+
+
+
 
         },
         'ar' : {
@@ -405,8 +415,10 @@ function myFunc() {
             'view': 'عرض القضايا',
             'guide': 'دليل كتابة اللوائح',
              'set': 'إعدادات',
-            'data': 'إعدادت قاعدة البيانات',
-            'bus': 'إعدادات اللوائح'
+            'data': 'إعدادات قاعدة البيانات',
+            'bus': 'إعدادات اللوائح',
+            'profile': 'الملف الشخصي',
+            'keyword': 'إعدادات كلمات البحث'
 
         }
     };
@@ -431,6 +443,9 @@ function myFunc() {
 
 
 <!-- ............ -->
+
+
+
 
 <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
 

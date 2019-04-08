@@ -140,7 +140,7 @@ function myFunc() {
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
-  <aside class="main-sidebar">
+ <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
@@ -172,7 +172,12 @@ function myFunc() {
 
           </a>
         </li>
+         <li>
+          <a href="{{ url_for('bankP') }}">
+            <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
+          </a>
+        </li>
 
              <li class="treeview">
           <a href="#">
@@ -184,6 +189,7 @@ function myFunc() {
           <ul class="treeview-menu">
            <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
             <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
+              <li><a class="lang" key="keyword" href="{{ url_for('keyword') }}">Keywords Setup</a></li>
 
           </ul>
         </li>
@@ -262,8 +268,8 @@ function myFunc() {
     <div class="col-md-7">
       <div class="box box-default" style="margin-left:10%;">
         <div class="box-body box-profile">
-          <h1>{{ data[0][5] }} Bnak</h1>
-
+            <form>
+          <h1>{{ form2.bnak_name.data }} Bnak</h1>
 
           <div style="margin-left:3%;">
           </div>
@@ -272,24 +278,24 @@ function myFunc() {
           <ul class="list-group list-group-unbordered">
 
 
-
               <li class="list-group-item">
               <b>AML Officer Fullname</b>
-              <p class="pull-right">{{ data[0][2] }}</p>
+              <p class="pull-right">{{ form2.AML_name.data}}</p>
             </li>
 
 
             <li class="list-group-item">
               <b>AML Officer username</b>
-              <p class="pull-right">{{session['username']}}</p>
+              <p class="pull-right">{{form2.username.data}}</p>
             </li>
 
             <li class="list-group-item">
               <b>AML Officer Email</b>
-              <p class="pull-right">{{session['email']}}</p>
+              <p class="pull-right">{{form2.Email.data}}</p>
             </li>
 
           </ul>
+                </form>
         <!-- /.box-body -->
       </div>
       </div>
@@ -317,7 +323,7 @@ function myFunc() {
   <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
- <!-- Transelate code -->
+<!-- Transelate code -->
 
 
 
@@ -333,7 +339,12 @@ function myFunc() {
             'guide': 'Business Rules Guide',
             'set': 'Settings',
             'data': 'Database Setup',
-            'bus': 'Business Rules Setup'
+            'bus': 'Business Rules Setup',
+            'profile': 'Profile',
+            'keyword': 'Keywords Setup'
+
+
+
 
         },
         'ar' : {
@@ -343,8 +354,10 @@ function myFunc() {
             'view': 'عرض القضايا',
             'guide': 'دليل كتابة اللوائح',
              'set': 'إعدادات',
-            'data': 'إعدادت قاعدة البيانات',
-            'bus': 'إعدادات اللوائح'
+            'data': 'إعدادات قاعدة البيانات',
+            'bus': 'إعدادات اللوائح',
+            'profile': 'الملف الشخصي',
+            'keyword': 'إعدادات كلمات البحث'
 
         }
     };

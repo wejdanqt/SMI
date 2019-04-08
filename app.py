@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, request, session, abort, url
     render_template_string , send_from_directory
 from flaskext.mysql import MySQL
 from forms import RegistrationForm, LoginForm, forgotPassForm, bankProfileForm, clientForm, oldCommentForm, newCommentForm, dbSetupForm , manageBankDataForm ,\
-    SearchForm , ViewProfileForm , ViewCasesForm , reportCase , uploadForm , uploadKeywords
+    SearchForm , ViewProfileForm , ViewCasesForm , reportCase , uploadForm , uploadKeywords , bankP_form
 from DBconnection import connection2, BankConnection , firebaseConnection
 from passwordRecovery import passwordRecovery
 from datetime import datetime
@@ -287,21 +287,35 @@ def bankP():
         return redirect(url_for('home'))
     username = session.get('username')
 
-    cursor.execute("SELECT * FROM AMLOfficer WHERE userName = '" + username + "'")
-    data1 = cursor.fetchall()
 
     cur, db, engine = connection2()
-    query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    form2 = bankP_form()
+    form = SearchForm()
+
+    query = "SELECT * FROM AMLOfficer WHERE userName = '" + username + "'"
     cur.execute(query)
+    data1 = cur.fetchall()
+
+    for column in data1:
+        form2.bnak_name.data = column[5]
+        form2.username.data =  column[0]
+        form2.AML_name.data =  column[2]
+        form2.Email.data =  column[1]
+
+
+
+    cur, db, engine = connection2()
+    query2 = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+    cur.execute(query2)
     totalAlert = cur.fetchall()
     totalAlert = len(totalAlert)
     print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
-    form = SearchForm()
+
 
     if form.validate_on_submit():
         return redirect((url_for('searchResult', id= form.search.data)))  # or what you want
-    return render_template("bankProfile.html", form = form, alert = totalAlert , data = data1)
+    return render_template("bankProfile.html", form = form, form2 = form2 , alert = totalAlert , data = data1)
 
 
 
@@ -468,7 +482,7 @@ def manageProfile():
     if form.profile_submit.data and form.validate_on_submit():
         cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
         data2 = cursor.fetchone()
-        if not (data2 is None):
+        if not ((data2 is None)) and (data2[0] != username):
             flash('This Email is already exists please try another email', 'danger')
             return render_template('ManageProfile.html', form=form , form2 = search_form , alert = totalAlert)
         else:
@@ -1049,7 +1063,7 @@ def DatabaseSetup():
 
 
 @app.route("/Report/<id>", methods=['GET', 'POST'])
-@register_breadcrumb(app, '.cases.case.Report', 'Email')
+@register_breadcrumb(app, '.cases.case.Report', 'Report')
 def Report(id):
     # Only logged in users can access bank profile
     if session.get('username') == None:

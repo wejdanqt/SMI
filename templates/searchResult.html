@@ -190,7 +190,12 @@ function myFunc() {
 
           </a>
         </li>
+         <li>
+          <a href="{{ url_for('bankP') }}">
+            <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
+          </a>
+        </li>
 
              <li class="treeview">
           <a href="#">
@@ -202,6 +207,7 @@ function myFunc() {
           <ul class="treeview-menu">
            <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
             <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
+              <li><a class="lang" key="keyword" href="{{ url_for('keyword') }}">Keywords Setup</a></li>
 
           </ul>
         </li>
@@ -337,8 +343,7 @@ function myFunc() {
 </div>
 <!-- ./wrapper -->
 
-   <!-- Transelate code -->
-
+<!-- Transelate code -->
 
 
 <script>
@@ -353,7 +358,12 @@ function myFunc() {
             'guide': 'Business Rules Guide',
             'set': 'Settings',
             'data': 'Database Setup',
-            'bus': 'Business Rules Setup'
+            'bus': 'Business Rules Setup',
+            'profile': 'Profile',
+            'keyword': 'Keywords Setup'
+
+
+
 
         },
         'ar' : {
@@ -363,8 +373,10 @@ function myFunc() {
             'view': 'عرض القضايا',
             'guide': 'دليل كتابة اللوائح',
              'set': 'إعدادات',
-            'data': 'إعدادت قاعدة البيانات',
-            'bus': 'إعدادات اللوائح'
+            'data': 'إعدادات قاعدة البيانات',
+            'bus': 'إعدادات اللوائح',
+            'profile': 'الملف الشخصي',
+            'keyword': 'إعدادات كلمات البحث'
 
         }
     };
@@ -383,9 +395,6 @@ function myFunc() {
     });
 
 </script>
-
-
-
 
 
 <!-- ............ -->

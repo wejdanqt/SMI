@@ -1,12 +1,17 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField ,FileField , SelectField , SelectMultipleField , validators , HiddenField , FloatField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField ,FileField , SelectField , SelectMultipleField , validators , HiddenField , \
+    FloatField
 from wtforms.validators import DataRequired, Length, Email, EqualTo , InputRequired
 from wtforms.widgets import html5
 
 
 
 
-
+class bankP_form(FlaskForm):
+    bnak_name = StringField()
+    AML_name = StringField()
+    username = StringField()
+    Email = StringField()
 
 
 
@@ -56,8 +61,8 @@ class forgotPassForm(FlaskForm):
 class bankProfileForm(FlaskForm):
    fullName = StringField('Full Name', validators=[DataRequired(), Length(min=2)])
    email = StringField('AML Officer Email', validators=[DataRequired(), Email()])
-   password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
-   confirm_password = PasswordField('Confirm Password',validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
+   password = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
+   confirm_password = PasswordField('Confirm New Password',validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
    profile_submit = SubmitField('Save Changes')
    delete = SubmitField('Delete Profile')
    cancel = SubmitField('Cancel')
