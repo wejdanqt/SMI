@@ -384,9 +384,34 @@ def clientProfile(id):
             cur.execute(query)
             return redirect(url_for('clientProfile' , oldCommentForm=old_comment , id1 = id1 , id = id))
 
+        ## View the case show the button
+
+        if type(id) == str:
+            query1 = "SELECT * FROM SMI_DB.Client WHERE clientName = '" + id + "'"
+            cur.execute(query1)
+            data = cur.fetchall()
+            for each in data:
+                id = each[0]
+
+        query = "SELECT * FROM SMI_DB.ClientCase WHERE clientID  =  '" + str(id) + "'"
+        cur.execute(query)
+        case = cur.fetchall()
+        print(len(case))
+
+        case_id = 0
+
+        if len(case) != 0:
+            query = "SELECT caseID FROM SMI_DB.ClientCase WHERE clientID  =  '" + str(id) + "'"
+            cur.execute(query)
+            data = cur.fetchall()
+
+            for each in data:
+                case_id = each[0]
+
 
         return render_template("clientProfile.html", clientForm = client_form, commentForm = new_comment , record = record ,
-                               record1 = record1,label = profileLabel , oldCommentForm=old_comment , form2=search_form , alert = totalAlert)
+                               record1 = record1,label = profileLabel , oldCommentForm=old_comment , form2=search_form ,
+                               alert = totalAlert , number_of_cases = len(case), case_id = case_id)
 
 
 
@@ -412,14 +437,24 @@ def manageProfile():
         cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
         data2 = cursor.fetchone()
         if not ((data2 is None)) and (data2[0] != username):
-            flash('This Email is already exists please try another email', 'danger')
+            flash('This Email is already used by another user please try another email', 'danger')
             return render_template('ManageProfile.html', form=form , form2 = search_form , alert = totalAlert)
         else:
             cur, db , engine = connection2()
-            cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' , password = '" + form.password.data + "' WHERE userName = '" + username + "'" )
-            db.commit()
-            flash('Profile Successfully updated', 'success')
-            return redirect(url_for('bankP'))
+            print('password type',type(form.password.data))
+            if not (form.password.data == '') :
+                #cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' , password = '" + form.password.data + "' WHERE userName = '" + username + "'" )
+                cur.execute("UPDATE SMI_DB.AMLOfficer SET fullname = %s, email=%s, password=%s  WHERE userName = '" + username + "'", (form.fullName.data, form.email.data ,  form.password.data  ))
+                db.commit()
+                print('password not changed')
+                flash('Profile Successfully updated', 'success')
+                return redirect(url_for('bankP'))
+            else:
+                cur.execute( "UPDATE SMI_DB.AMLOfficer SET fullname = '" + form.fullName.data + "' , email = '" + form.email.data + "' WHERE userName = '" + username + "'")
+                db.commit()
+                print('password is changed')
+                flash('Profile Successfully updated', 'success')
+                return redirect(url_for('bankP'))
 
 
 
@@ -511,19 +546,43 @@ def manageBankData():
         print(filename)
 
         if filename.split(".", 1)[1] != 'txt':
-            flash('File extention should be txt', 'danger')
+            file_exttintion_txt = 1
             return render_template("ManageBankData.html", form=form, form2=search_form,
-                                   form3=form3 , alert = totalAlert)
+                                   file_exttintion_txt = file_exttintion_txt , form3=form3 , alert = totalAlert)
 
         else:
             dest = "/".join([target, filename])
             print(dest)
             file.save(dest)
+
+            ### get names entered by user ###
+            user_sanction_list = []
+            f = open(dest, mode="r", encoding='utf-8')
+            for line in f:
+                user_sanction_list.append(line.rstrip('\n'))
+
+            print('length of user words', len(user_sanction_list))
+
+            #### If the is empty ####
+            if len(user_sanction_list) == 0:
+                flash('The uploaded file is empty..', 'danger')
+                return render_template("ManageBankData.html", form=form,form2 = search_form, form3=form3, alert= totalAlert)
+
+
+
         try:
 
             # businessRules_file = businessRules_file.data
             sanction_list = open("Br_file/" + filename, "r")
             risk_countries = form.risk_countries.data
+            #default selectd countires in case the user didn't select any FATF
+            if len(risk_countries) == 0:
+                print("Risk countries", len(risk_countries))
+                risk_countries = ['Bahamas' , 'Botswana' , 'Cambodia' , 'Democratic Peoples Republic of Korea (DPRK)'
+                                  , 'Ethiopia' , 'Ghana' , 'Iran' , 'Pakistan' , 'Serbia' , 'Sri Lanka'
+                                  , 'Syria' , 'Trinidad and Tobago' , 'Tunisia' , 'Yemen']
+
+
             exceed_avg_tran = form.exceed_avg_tran.data
             # type1 = form.type.data
             amount = form.amount.data
@@ -927,8 +986,8 @@ def download(id):
     return response
 
 
+#breadcrumbs
 @app.route("/DatabaseSetup", methods=['GET', 'POST'])
-@register_breadcrumb(app, '.DatabaseSetup', 'Database setup')
 def DatabaseSetup():
     # Only logged in users can access bank profile
     if session.get('username') == None:
@@ -987,7 +1046,7 @@ def DatabaseSetup():
             config.write(configfile)
         status, cur, db, engine= BankConnection()
         if status == 1:
-            flash('Unable to connect please try again..', 'danger')
+            flash('Invalid database credentials, please try again.', 'danger')
             return render_template("databaseSetup.html", form=form, status = status ,
                                    form2=search_form, form3=form3 , alert = totalAlert)
         else:
@@ -996,6 +1055,7 @@ def DatabaseSetup():
                 form = manageBankDataForm()
                 return render_template("ManageBankData.html", form=form, form2=search_form,
                                        form3= form3 , alert = totalAlert)
+
 
                 # Check if bussinse rule is uploaded
             flash('Successfully connected to the database..', 'success')
@@ -1236,7 +1296,7 @@ def keyword():
             print('length of user words', len(user_word))
 
             #### If the is empty ####
-            if len(user_word) ==0 :
+            if len(user_word) == 0 :
                 flash('The uploaded file is empty..', 'danger')
                 return render_template("keyword.html", form2=search_form, form3=form3, alert=totalAlert, fileEx=fileEx)
 

@@ -45,7 +45,7 @@
            <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
       <!-- logo for regular state and mobile devices -->
-     <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
+     <span class="logo-lg">  <img height="39" width="115"  src="{{url_for('static', filename='dist/img/newlm.png')}}"alt="User Image"></span>
 
     </a>
           <!-- Header Navbar: style can be found in header.less -->
@@ -387,7 +387,7 @@ function myFunc() {
 
 <script>
 function myFunction() {
-  var r = confirm("Are you sure you want to delete you'r account?");
+  var r = confirm("This action will delete your account permanently, are you want to proceed?");
   if (r === true) {
       var a = document.getElementById('del');
       a.href = "/deleteProfile"

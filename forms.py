@@ -59,10 +59,10 @@ class forgotPassForm(FlaskForm):
 
 
 class bankProfileForm(FlaskForm):
-   fullName = StringField('Full Name', validators=[DataRequired(), Length(min=2)])
+   fullName = StringField('Full Name', validators=[DataRequired(),  Length(min=2 , max = 30 )])
    email = StringField('AML Officer Email', validators=[DataRequired(), Email()])
-   password = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
-   confirm_password = PasswordField('Confirm New Password',validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
+   password = PasswordField('New Password', [validators.optional(), validators.length(min = 8)])
+   confirm_password = PasswordField('Confirm New Password', validators= [validators.optional(EqualTo('password', message='Passwords must match'))])
    profile_submit = SubmitField('Save Changes')
    delete = SubmitField('Delete Profile')
    cancel = SubmitField('Cancel')

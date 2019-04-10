@@ -46,7 +46,7 @@
            <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
 
       <!-- logo for regular state and mobile devices -->
-     <span class="logo-lg">  <img  height="50" width="95" src="{{url_for('static', filename='dist/img/newl.png')}}"alt="User Image"></span>
+     <span class="logo-lg">  <img  height="39" width="115"  src="{{url_for('static', filename='dist/img/newlm.png')}}"alt="User Image"></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -154,7 +154,7 @@
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
-           <a> <i class="fa fa-search"></i> <span>Search For Client</span>
+           <a> <i class="fa fa-search"></i> <span class="lang" key="search" >Search For Client</span>
               </a>
                 <!-- search form -->
               <form action="#" method="post" class="sidebar-form" role="form">
@@ -162,7 +162,7 @@
               <div class="input-group">
                    {{ form2.search( class="form-control")  }}
 
-                        {{ form2.search_submit(class="btn btn-primary btn-block btn-flat input-group-btn") }}
+                        {{ form2.search_submit() }}
                         <!-- <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                       </button> -->
               </div>
@@ -173,35 +173,54 @@
 
         <li>
           <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span class="lang" key="home">Home</span>
+            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
+
+          </a>
+        </li>
+         <li>
+          <a href="{{ url_for('bankP') }}">
+            <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
           </a>
         </li>
 
-
              <li class="treeview">
           <a href="#">
-            <i class="fa fa-edit"></i> <span>Manage Bank Data</span>
+            <i class="fa fa-gear"></i> <span class="lang" key="set">Settings</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-           <li><a href="{{ url_for('DatabaseSetup') }}"> Database Setup</a></li>
-            <li><a href="{{ url_for('manageBankData') }}">business Rules Setup</a></li>
+           <li> <a  class="lang" key="data" href="{{ url_for('DatabaseSetup') }}">Database Setup</a></li>
+            <li><a class="lang" key="bus" href="{{ url_for('manageBankData') }}">Business Rules Setup</a></li>
+              <li><a class="lang" key="keyword" href="{{ url_for('keyword') }}">Keywords Setup</a></li>
 
           </ul>
         </li>
         <li>
-          <a href="{{ url_for('manageProfile') }}">
-          <span>Manage Profile</span>
+          <a href="{{ url_for('manageProfile') }}" >
+               <i class="fa fa-edit"></i>
+          <span class="lang" key="edit">Edit Profile</span>
           </a>
         </li>
 
 
           <li>
            <a href="{{ url_for('cases') }}">
-          <span>View Cases</span>
+                 <i class="fa fa-folder-open"></i>
+          <span class="lang" key="view">View Cases</span>
+            <span class="pull-right-container">
+
+            </span>
+          </a>
+        </li>
+
+
+              <li>
+           <a href="{{ url_for('BR_GUIDE') }}">
+                 <i class="fa fa-file-code-o"></i>
+          <span class="lang" key="guide">Business Rules Guide</span>
             <span class="pull-right-container">
 
             </span>
@@ -252,7 +271,7 @@
 
              <div class="box-body box-profile" style="margin-left:5%;">
 
-            <h3> Business Rules Guide</h3>
+            <h3 class="lang" key="guideTitle"> Business Rules Guide</h3>
 
 
 
@@ -262,65 +281,72 @@
           <div class="box-body">
 
 
-              <p>This Guide will help you writing you own business rules</p>
-
-            <p class="text-muted">
+              <p class="lang" key="guideDes" >This Guide will help you writing you own business rules</p>
 
 
-            </p>
-               <strong>1-File Format</strong>
+               <strong class="lang" key="guidePoint1" >1-File Format</strong>
 
-             <p class="text-muted">Your rules files must be in json format (.json)</p>
+              <div class ="text-muted">
+                  <p class="lang" key="guidePoint1p1" >Your rules file must be in json format (.JSON) </p> </div>
 
-                <strong>2-File Structure</strong>
+                <strong class="lang" key="guidePoint2" >2-File Structure</strong>
 
-             <p class="text-muted">After creating a JSON, your file must start with the key word "Rules" to include all your rules inside it later on </p>
+              <div class ="text-muted">
+                  <p class="lang" key="guidePoint2p1" >After creating a JSON file, your file must start with the keyword "Rules" to include all your rules inside it later on </p>
+              </div>
               <pre class="prettyprint">{"Rules" : {}}
               </pre>
 
-              <strong>3-Writing the rules </strong>
+              <strong class="lang" key="guidePoint3" >3-Writing the rules </strong>
 
-             <p class="text-muted"> You will start writing the first rule inside "Rules" node, each rule should be indicated by "Rule" keyword followed by the rule number
-             as shown in the example, it's important that the rules numbers to be sequntially and start with number 1 </p>
+                <div class ="text-muted">
+             <p class="lang" key="guidePoint3p1"> You will start writing the first rule inside keyword "Rules" brackets, each rule should be indicated by "Rule" keyword followed by the rule number
+             as shown in the example, it's important that the rules numbers to be sequentially and start with number 1 </p>
+                </div>
               <pre class="prettyprint">{"Rules" : {"Rule1" : [] }}
 
               </pre>
-
-               <p class="text-muted"> The rule should start with the attribute you want to check, its important for the attribute to be in the database otherwise the file won't be accepted </p>
+                <div class ="text-muted">
+               <p class="lang" key="guidePoint3p2" > The rule should start with the attribute you want to check, its important for the attribute to be in the bank database otherwise the file won't be accepted </p>
+                </div>
               <pre class="prettyprint">{"Rules" : {"Rule1" : ["variable1"] }}
 
               </pre>
-
-              <p class="text-muted"> After writing the variable you can check it by adding the operand , the variable and the operand should be sperated by a comma.
-              legal operands (<,>,==,<=,>=)</p>
+              <div class ="text-muted">
+              <p class="lang" key="guidePoint3p3"> After writing the variable you can check it by adding any arithmetic operator , the variable and the operator should be separated by a comma.
+              legal operators (<,>,==,<=,>=)</p>
+              </div>
               <pre class="prettyprint">{"Rules" : {"Rule1" :["variable1","=="] }}
 
               </pre>
-
-              <p class="text-muted"> Then you write the value you want to check sperated by a comma from the operand </p>
+              <div class ="text-muted">
+              <p class="lang" key="guidePoint3p4"> Then you write the value you want to check separated by a comma from the operator </p>
+              </div>
               <pre class="prettyprint">{"Rules" : {"Rule1" :["variable1","==","value"] }}
 
               </pre>
-
-               <p class="text-muted"> If you want to add more rules you should repate the steps, the result should look like this:</p>
+                <div class ="text-muted">
+               <p class="lang" key="guidePoint3p5"> If you want to add more rules you should repeat all the steps in number 3, the result should look like this:</p>
+                </div>
               <pre class="prettyprint">{"Rules" : {"Rule1" :["variable1","==","value"],
              "Rule2" :["variable1","==","value"]}}
 
               </pre>
 
-              <strong>4-Adding Sanction List </strong>
-
-             <p class="text-muted"> You will start writing the first rule inside "Rules" node, each rule should be indicated by "Rule" keyword followed by the rule number
-             as shown in the example, it's important that the rules numbers to be sequntially and start with number 1 </p>
-              <pre class="prettyprint">{"Rules" : {"Rule1" : [] }}
+              <strong class="lang" key="guidePoint4">4-Adding Sanction List </strong>
+            <div class ="text-muted">
+             <p class="lang" key="guidePoint4P1"> You can add clients names in sanction list by including them in a separated Keyword, "SanctionList" </p>
+            </div>
+              <pre class="prettyprint">{"Rules" : {"Rule1" :["variable1","==","value"],
+             "Rule2" :["variable1","==","value"]}},"SanctionList":["firstClientName","SecondClientName"]
 
               </pre>
 
-              <strong>5-Adding High risk countries </strong>
+              <strong class="lang" key="guidePoint5" >5-Adding High risk countries </strong>
 
-             <p class="text-muted"> You will start writing the first rule inside "Rules" node, each rule should be indicated by "Rule" keyword followed by the rule number
-             as shown in the example, it's important that the rules numbers to be sequntially and start with number 1 </p>
-              <pre class="prettyprint">{"Rules" : {"Rule1" : [] }}
+             <p class="lang" key="guidePoint5p1">  You can high risk countries by including them in a separated Keyword, "HighRiskCountries" </p>
+              <pre class="prettyprint">{"Rules" : {"Rule1" :["variable1","==","value"],
+             "Rule2" :["variable1","==","value"]}},"SanctionList":["firstClientName","SecondClientName"],"HighRiskCountries":["firstCountry","SecondCountry"]
 
               </pre>
 
@@ -376,13 +402,59 @@
     var arrLang ={
         'en' : {
             'home': 'Home',
-            'about': 'About',
-            'contact': 'Contact Us'
+            'search': 'Search For Client',
+            'edit': 'Edit Profile',
+            'view': 'View Cases',
+            'guide': 'Business Rules Guide',
+            'set': 'Settings',
+            'data': 'Database Setup',
+            'bus': 'Business Rules Setup',
+            'guideTitle': 'Business Rules Guide',
+            'guideDes': 'This Guide will help you writing you own business rules',
+            'guidePoint1':  '1-File Format',
+            'guidePoint1p1':  'Your rules file must be in json format',
+            'guidePoint2' : '2-File Structure',
+            'guidePoint2p1': 'After creating a JSON file, your file must start with the keyword to include all your rules inside it later on',
+            'guidePoint3':'3-Writing the rules',
+            'guidePoint3p1': ' You will start writing the first rule inside keyword "Rules" brackets, each rule should be indicated by "Rule" keyword followed by the rule number\n' +
+                '             as shown in the example, it\'s important that the rules numbers to be sequentially and start with number 1',
+            'guidePoint3p2':'The rule should start with the attribute you want to check, its important for the attribute to be in the bank database otherwise the file won\'t be accepted ',
+            'guidePoint3p3' : 'After writing the variable you can check it by adding any arithmetic operator , the variable and the operator should be separated  by a comma.\n' +
+                '              legal operators (<,>,==,<=,>=)',
+            'guidePoint3p4' :'Then you write the value you want to check separated by a comma from the operator ',
+            'guidePoint3p5': ' If you want to add more rules you should repeat all the steps in number 3, the result should look like this:',
+            'guidePoint4' : '4-Adding Sanction List',
+            'guidePoint4p1': 'You can add clients names in sanction list by including them in a separated Keyword, "SanctionList"',
+            'guidePoint5':'5-Adding High risk countries',
+            'guidePoint5p1':'You can high risk countries by including them in a separated Keyword, "HighRiskCountries"'
         },
         'ar' : {
              'home': 'الصفحة الرئيسية',
-            'about': 'عنا',
-            'contact': 'اتصل بنا'
+            'search': 'البحث عن عميل',
+            'edit': 'تعديل الملف الشخصي',
+            'view': 'عرض القضايا',
+            'guide': 'دليل كتابة اللوائح',
+             'set': 'إعدادات',
+            'data': 'إعدادت قاعدة البيانات',
+            'bus': 'إعدادات اللوائح',
+            'guideTitle': 'دليل كتابة اللوائح',
+            'guideDes': 'هذا الدليل سيساعدك في كتابة اللوائح الخاصة بك',
+            'guidePoint1':  '١- صيغة الملف',
+            'guidePoint1p1':  'ملف اللوائح يجب أن يكون بصيغة جسون ',
+            'guidePoint2': '٢- تنظيم الملف',
+            'guidePoint2p1':'بعد انشاء ملف بصيغة جسون ، الملف الخاص بك يجب أن يبدأ بالكلمة المفتاحية  لتتضمن جميع اللوائح بداخلها لاحقًا ',
+            'guidePoint3': '٣- كتابة اللوائح',
+            'guidePoint3p1': 'ستبدأ كتابة اللائحة الأولى داخل اقواس الكلمةالمفتاحية ""، كل لائحة يجب أن تبدأ بالكلمة المفتاحية "" وتُتبع برقم' +
+                ' اللائحة كما هو موضح بالمثال، من المهم أن تكون أرقام اللوائح متسلسلة وتبدأ بالرقم ١',
+            'guidePoint3p2': 'اللائحة يجب أن تبدأ بالمتغير المراد التحقق منه، من المهم أن يكون المتغير موجود في قاعدة البيانات الخاصة بالبنك، وإلا لن يقبل الملف',
+            'guidePoint3p3' : 'بعد كتابة المتغير يمكنك التحقق منه عن طريق إضافة أي عملية حسابية، المتغير والعملية الحسابية يجب أن تكون منفصلة بفاصلة.' +
+                'العمليات المسموحه(>،<،==،>=،<=) ',
+            'guidePoint3p4' : 'بعد ذلك يمكنك كتابة القيمة المراد التحقق منها بعد إضافة فاصلة بينها وبين العملية الحسابية',
+            'guidePoint3p5' : ':عند الرغبة في إضافة المزيد من اللوائح، يجب عليك أن تكرر جميع الخطوات المندرجه تحت خطوة رقم ٣، النتيجة يجب أن تكون مماثلة لهذا المثال ',
+            'guidePoint4' : '٤- إضافة قائمة العقوبات',
+            'guidePoint4p1' : 'يمكنك إضافة أسماء العملاء المدرجة تحت قائمة العقوبات داخل الكلمة المفتاحية "" ',
+            'guidePont5':'٥- إضافة الدول عالية الخطر',
+            'guidePoint5p1': 'يمكنك إضافة الد،ل عالية المخاطر داخل الكلمة المفتاحية "" '
         }
     };
     $(function () {
