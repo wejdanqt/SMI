@@ -156,13 +156,14 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        cur, db, engine = connection2()
         # Checking If the account(user_name) is already registered.
-        cursor.execute("SELECT * FROM AMLOfficer WHERE userName = '" + form.username.data + "'")
-        data1 = cursor.fetchone()
+        cur.execute("SELECT * FROM AMLOfficer WHERE userName = '" + form.username.data + "'")
+        data1 = cur.fetchone()
 
         # Checking If the account(email) is already registered.
-        cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
-        data2 = cursor.fetchone()
+        cur.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
+        data2 = cur.fetchone()
 
         if not (data1 is None):
             flash('This Username is already registered please try another username', 'danger')
@@ -171,9 +172,9 @@ def register():
             flash('This Email is already registered please try another email', 'danger')
             return render_template('Register.html', form=form)
         else:
-            cur, db , engine = connection2()
-            query = "INSERT INTO AMLOfficer (userName, email, fullname, password , bankName) VALUES(%s,%s,%s,%s,%s)"
-            val = (form.username.data, form.email.data, form.fullName.data, form.password.data , form.bankName.data)
+
+            query = "INSERT INTO AMLOfficer (userName, email, fullname, password) VALUES(%s,%s,%s,%s)"
+            val = (form.username.data, form.email.data, form.fullName.data, form.password.data)
             cur.execute(query, val)
             db.commit()
             cur.close()
