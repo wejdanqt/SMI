@@ -101,12 +101,29 @@
 
 
                 <!-- User Account: style can be found in dropdown.less -->
+                 <!-- User Account: style can be found in dropdown.less -->
                 <li class="dropdown user user-menu">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <span class="hidden-xs">{{ session['username'] }}</span>
                   </a>
+                  <ul class="dropdown-menu">
+                    <!-- User image -->
+                    <li class="user-header">
+                      <p>
+                       {{ session['username'] }}
+                        <small>AML Officer</small>
+                      </p>
+                    </li>
+                    <!-- Menu Body -->
 
+                    <!-- Menu Footer-->
+                    <li class="user-footer">
+                      <div style="margin-left:38%;">
+                      </div>
+                    </li>
+                  </ul>
                 </li>
+                <!-- Control Sidebar Toggle Button -->
                 <!-- Control Sidebar Toggle Button -->
                 <li>
 
@@ -119,7 +136,7 @@
 
 
                    <li>
-                  <a id = 'log' onclick="myFunc()" ><i class="fa fa-sign-out"></i></a>
+                  <a id = 'log' onclick="myFunc()" >Logout &nbsp; <i class="fa fa-sign-out"></i></a>
 
 
           </li>
@@ -140,12 +157,12 @@ function myFunc() {
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
- <aside class="main-sidebar">
+ <aside class="main-sidebar"   >
     <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
+    <section class="sidebar"  >
       <!-- Sidebar user panel -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu" data-widget="tree">
+      <ul class="sidebar-menu" data-widget="tree" >
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
@@ -166,18 +183,14 @@ function myFunc() {
         </li>
 
 
-        <li>
-          <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
-
-          </a>
-        </li>
          <li>
           <a href="{{ url_for('bankP') }}">
             <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
           </a>
         </li>
+
+
 
              <li class="treeview">
           <a href="#">
@@ -193,12 +206,7 @@ function myFunc() {
 
           </ul>
         </li>
-        <li>
-          <a href="{{ url_for('manageProfile') }}" >
-               <i class="fa fa-edit"></i>
-          <span class="lang" key="edit">Edit Profile</span>
-          </a>
-        </li>
+
 
 
           <li>
@@ -295,6 +303,7 @@ function myFunc() {
             </li>
 
           </ul>
+                <a class="btn btn-default" href="/ManageProfile" style="margin-left: 40%">Edit Profile &nbsp; <i class="fa fa-edit"></i></a>
                 </form>
         <!-- /.box-body -->
       </div>

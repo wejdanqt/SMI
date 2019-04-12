@@ -1,14 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+    <style>
+
+.pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+}
+.pagination-page-info b {
+    color: black;
+    background: #6aa6ed;
+    padding-left: 2px;
+    padding: .1em .25em;
+    font-size: 150%;
+}
+
+    </style>
+
+
+  <script>
+
+     window.addEventListener( "pageshow", function ( event ) {
+  var historyTraversal = event.persisted ||
+                         ( typeof window.performance != "undefined" &&
+                              window.performance.navigation.type === 2 );
+  if ( historyTraversal ) {
+    // Handle page restore.
+    window.location.reload();
+  }
+});
+  </script>
+
+
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> SMI | Edit Profile</title>
+  <title> SMI | View Cases</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <!-- Bootstrap 3.3.7 -->
+     <!-- Bootstrap 3.3.7 -->
 
-    <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+      <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
 
   <!-- Font Awesome -->
 
@@ -20,7 +56,9 @@
 
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
-      <link href="{{ url_for('static', filename='dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
+
+
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -28,6 +66,8 @@
   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
+  <!-- Google Translate Element begin -->
+
 
 
 
@@ -40,12 +80,11 @@
 
         <header class="main-header">
           <!-- Logo -->
-          <a class="logo" style="background-color:#0f5757;">
-             <!-- mini logo for sidebar mini 50x50 pixels -->
-           <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
-
+          <a  class="logo" style="background-color:#0f5757;">
+            <!-- mini logo for sidebar mini 50x50 pixels -->
+             <span class="logo-mini"  ><img  height="45" width="38" src="{{url_for('static', filename='dist/img/slogo.png')}}"  alt="User Image"></span>
       <!-- logo for regular state and mobile devices -->
-     <span class="logo-lg">  <img height="39" width="115"  src="{{url_for('static', filename='dist/img/newlm.png')}}"alt="User Image"></span>
+           <span class="logo-lg">  <img height="39" width="115"  src="{{url_for('static', filename='dist/img/newlm.png')}}"alt="User Image"></span>
 
     </a>
           <!-- Header Navbar: style can be found in header.less -->
@@ -125,8 +164,7 @@
                   </ul>
                 </li>
                 <!-- Control Sidebar Toggle Button -->
-
-                <li>
+                   <li>
 
             <a class="translate" id ="en"  >English</a>
 
@@ -134,6 +172,8 @@
         <li>
             <a class="translate" id ="ar" >Arabic</a>
         </li>
+
+          <li>
 
                   <li>
                   <a id = 'log' onclick="myFunc()" ><i class="fa fa-sign-out"></i></a>
@@ -151,12 +191,13 @@ function myFunc() {
 }
 </script>
 
+
               </ul>
             </div>
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
-  <aside class="main-sidebar"   >
+      <aside class="main-sidebar"   >
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar"  >
       <!-- Sidebar user panel -->
@@ -235,176 +276,98 @@ function myFunc() {
   </aside>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
-       {% with messages = get_flashed_messages(with_categories=true) %}
-
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" style="opacity: 0.6;">
-                {{ message }}
-                </div>
-
-            {% endfor %}
-
-        {% endif %}
-    {% endwith %}
-    <div class="container">
-
-      <section class="content-header">
-         <ol class="breadcrumb">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        <br>
+      <!--  <small>preview of simple tables</small> -->
+      </h1>
+     <ol class="breadcrumb">
            {%- for breadcrumb in breadcrumbs -%}
             <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
             {{ ' > ' if not loop.last }}
         {%- endfor -%}
+
+
       </ol>
 
+    </section>
 
-      </section>
-
-
-
-    <h1></h1>
-	<div class="row">
-      <!-- left column -->
-
-
-      <!-- edit form column -->
-
-      <div class="col-md-9 personal-info">
-        <h3 style="color:#004D40;"> <b> Personal info</b></h3>
-      <br>
-
-            <div class = "form-horizontal">
-           <form action="" method="post"  onsubmit= "return confirm('Are you sure you want to save changes ?')" >
-    {{ form.hidden_tag() }}
-    <!-- drop down list here-->
-           <!-- Full Name -->
-      <div class="form-group has-feedback">
-          {{ form.fullName.label(class="col-lg-3 form-control-label") }}
-
-                    {% if form.fullName.errors %}
-                         <div class="col-lg-8">
-                        {{ form.fullName(class="form-control form-control-lg") }}
-
-                        <div class="invalid-feedback">
-                            {% for error in form.fullName.errors %}
-                                <span style="color: red;">{{ error }}</span>
-                            {% endfor %}
-                          </div>
-                        </div>
-                    {% else %}
-                          <div class="col-lg-8">
-                        {{ form.fullName(class="form-control form-control-lg") }}
-                          </div>
-                    {% endif %}
-
-      </div>
-
-           <!-- Email -->
-            <div class="form-group has-feedback">
-          {{ form.email.label(class="col-lg-3 form-control-label") }}
-
-                    {% if form.email.errors %}
-                         <div class="col-lg-8">
-                        {{ form.email(class="form-control form-control-lg") }}
-
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span style="color: red;">{{ error }}</span>
-                            {% endfor %}
-                          </div>
-                        </div>
-                    {% else %}
-                          <div class="col-lg-8">
-                        {{ form.email(class="form-control form-control-lg") }}
-                          </div>
-                    {% endif %}
-                         </div>
-
-
-                <!-- Password -->
-              <div class="form-group has-feedback">
-          {{ form.password.label(class="col-lg-3 form-control-label") }}
-
-                    {% if form.password.errors %}
-                         <div class="col-lg-8">
-                        {{ form.password(class="form-control form-control-lg") }}
-
-                        <div class="invalid-feedback">
-                            {% for error in form.password.errors %}
-                                <span style="color: red;">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        </div>
-                    {% else %}
-                        <div class="col-lg-8">
-                        {{ form.password(class="form-control form-control-lg") }}
-                        </div>
-                    {% endif %}
-      </div>
-
-           <!-- Confirm password -->
-            <div class="form-group has-feedback">
-          {{ form.confirm_password.label(class="col-lg-3 form-control-label") }}
-
-                    {% if form.confirm_password.errors %}
-                         <div class="col-lg-8">
-                        {{ form.confirm_password(class="form-control form-control-lg") }}
-
-                        <div class="invalid-feedback">
-                            {% for error in form.confirm_password.errors %}
-                                <span style="color: red;">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        </div>
-                    {% else %}
-                        <div class="col-lg-8">
-                        {{ form.confirm_password(class="form-control form-control-lg") }}
-                        </div>
-                    {% endif %}
-                    </div>
-
-
-
+    <!-- Main content -->
+    <section class="content">
+      <!-- /.row -->
       <div class="row">
-        <!-- /.col -->
-        <div class="col-xs-5" style="margin-left:40%">
-            {{ form.profile_submit( class="btn btn-primary btn-block btn-flat") }}
-          <br>
-            <a id = 'del' class="btn btn-danger" onclick="myFunction()" style="margin-left: 33%" >Delete Account</a>
-
-        </div>
-
-
-
-<script>
-function myFunction() {
-  var r = confirm("This action will delete your account permanently, are you want to proceed?");
-  if (r === true) {
-      var a = document.getElementById('del');
-      a.href = "/deleteProfile"
-  }
-}
-</script>
-
-        <!-- /.col -->
-      </div>
-        </br>
-
-    </form>
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title"></h3>
             </div>
+            <!-- /.box-header -->
+
+
+            <div class="box-body table-responsive no-padding">
+             <form  action="{{ url_for('cases') }}" method="post" role="form">
+                 <strong style="font-size: 120%;"> &nbsp; Number of Cases found : </strong> <b style="color: #A10303; font-size: 120%;">{{ total }}</b>
+
+              {{ form.hidden_tag() }}
+              <table class="table table-hover">
+                <tr>
+                  <th>Case Id</th>
+                    <th>Case Classification</th>
+                    <th>Date</th>
+                  <th>Action</th>
+                </tr>
+                <!-- tr problem -->
+                    {% if  numOfcase == 0 %}
+
+                    <tr>
+                   <td><p style="margin-left: 1%; font-size: 140%; color: darkred " >No cases found</p></td>
+
+                    </tr>
+                  {% endif %}
+
+
+                   {% for case in cases %}
+                    <tr>
+                    <td>{{ case[0] }}</td>
+                     <td> {{ case[1] }}</td>
+                     <td> {{ case[2] }}</td>
+
+                    <td>
+
+                        <button type="submit" class="btn btn-default btn-sm" name="caseView" value="{{ case[0] }}">View Case</button>
+                       <!-- <a href= '/download/' class="btn btn-default" > <i class="fa fa-save"></i></a> -->
+
+                         &nbsp;{% if case[4] == 1 %}
+                        <label style="color: #A10303">NEW</label>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                  </tr>
+
+
+
+
+              </table>
+
+
+                <div style="margin-left: 20%">
+
+             {{ pagination.links }}
+            </div>
+
+             </form>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
       </div>
+    </section>
+    <!-- /.content -->
   </div>
-</div>
-  </div>
-
-
-
   <!-- /.content-wrapper -->
-  <!--  <footer class="main-footer">
 
-  </footer>-->
-
-  <!-- Control Sidebar -->
 
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed
@@ -469,9 +432,12 @@ function myFunction() {
 </script>
 
 
+
+
+
 <!-- ............ -->
 
-<!-- jQuery 3 -->
+
 
 
 <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>

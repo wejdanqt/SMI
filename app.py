@@ -243,6 +243,8 @@ def bankP():
 
 
     if form.validate_on_submit():
+        if form.search.data in [''] or form.search.data[0] in ['/', "\\"]:
+            form.search.data = 0
         return redirect((url_for('searchResult', id= form.search.data)))  # or what you want
     return render_template("bankProfile.html", form = form, form2 = form2 , alert = totalAlert , data = data1)
 
@@ -256,13 +258,15 @@ def searchResult(id):
     if session.get('username') == None:
         return redirect(url_for('home'))
     else:
+        search_form = SearchForm()
         cur, db , engine = connection2()
+
         query = "SELECT * FROM SMI_DB.Client WHERE clientID  =  '" + id + "'  OR clientName  = '" + id + "'"
         cur.execute(query)
         data = cur.fetchall()
         print(len(data))
         form = ViewProfileForm()
-        search_form = SearchForm()
+
 
         query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
         cur.execute(query)
@@ -275,7 +279,10 @@ def searchResult(id):
             return redirect((url_for('clientProfile', id = id  , form = form )))
 
         if search_form.search_submit.data and search_form.validate_on_submit():
-            return redirect((url_for('searchResult', id=search_form.search.data , form2 = search_form ,
+            if search_form.search.data in [''] or search_form.search.data[0] in ['/' , "\\"]:
+                search_form.search.data = 0
+                print('search 2', search_form.search.data)
+            return redirect((url_for('searchResult', id= search_form.search.data , form2 = search_form ,
                                      alert = totalAlert , NoResult = len(data) )))
 
         return render_template("searchResult.html", data=data, form=form , form2 = search_form ,
@@ -371,6 +378,8 @@ def clientProfile(id):
         print(old_comment.delete.data)
 
         if search_form.search_submit.data and search_form.validate_on_submit():
+            if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+                search_form.search.data = 0
             return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
 
@@ -411,7 +420,7 @@ def clientProfile(id):
 
         return render_template("clientProfile.html", clientForm = client_form, commentForm = new_comment , record = record ,
                                record1 = record1,label = profileLabel , oldCommentForm=old_comment , form2=search_form ,
-                               alert = totalAlert , number_of_cases = len(case), case_id = case_id)
+                               alert = totalAlert , number_of_cases = len(case), case_id = case_id , client_id = id)
 
 
 
@@ -471,6 +480,8 @@ def manageProfile():
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
         return redirect((url_for('searchResult', id= search_form.search.data , form2 = search_form  , alert = totalAlert)))
 
     return render_template("ManageProfile.html", form=form , form2 = search_form , alert = totalAlert )
@@ -568,7 +579,20 @@ def manageBankData():
                 flash('The uploaded file is empty..', 'danger')
                 return render_template("ManageBankData.html", form=form,form2 = search_form, form3=form3, alert= totalAlert)
 
+            ## If the sanction list is already uploaded ##
 
+            '''sanction_list = fb.child('Rule4').child('blackList').get().val()
+            print('Sanction:', sanction_list)
+
+            if sanction_list == None:
+                sanction_list = []
+
+
+            #### get unique words only ####
+            if len(sanction_list) > len(user_sanction_list):
+                new_sanction = set(sanction_list) - set(user_sanction_list)
+            else:
+                new_sanction = set(user_sanction_list) - set(sanction_list)'''
 
         try:
 
@@ -592,6 +616,8 @@ def manageBankData():
             fb.child('Rule3').child('suspiciousTransaction').child('amount').set(amount)
             fb.child('Rule4').child('blackList').set(sanction_list.read().splitlines())
 
+
+
         except Exception as e:
             flash('Please connect to the Internet..', 'danger')
             print(e)
@@ -609,6 +635,8 @@ def manageBankData():
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3=form3) ))
 
 
@@ -748,11 +776,9 @@ def manageBankData():
     # treger code
 
 
-
     return render_template("ManageBankData.html", form=form, form2=search_form, FB_flag=FB_flag ,
                            form3=form3 , alert = totalAlert)
 #cases page
-
 
 
 @app.route("/Cases" , methods=['GET', 'POST'])
@@ -769,6 +795,7 @@ def cases():
         return redirect(url_for('home'))
     else:
         cur, db, engine = connection2()
+        count = 0
         form = ViewCasesForm()
         search_form = SearchForm()
         per_page = 4
@@ -794,6 +821,8 @@ def cases():
         #.................
 
         if search_form.search_submit.data and search_form.validate_on_submit():
+            if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+                search_form.search.data = 0
             return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
 
@@ -814,7 +843,7 @@ def cases():
         # e.g. Pagination(per_page_parameter='pp')
         #, pagination=pagination
 
-        return render_template("cases.html", cases = cases, numOfcase = len(cases) , form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0 ,alert = totalAlert)
+        return render_template("cases.html", count = count  ,cases = cases,total= len(total), numOfcase = len(cases) , form=form ,form2 = search_form  , pagination=pagination ,css_framework='foundation', caseId = 0 ,alert = totalAlert)
 
 #case page
 
@@ -829,6 +858,8 @@ def case(id):
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
 
@@ -1009,6 +1040,8 @@ def DatabaseSetup():
     #search code
 
     if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
         return redirect((url_for('searchResult', id=search_form.search.data,
                                  form2=search_form, form3=form3 , alert = totalAlert)))
 
@@ -1086,6 +1119,8 @@ def Report(id):
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
 
 
@@ -1169,7 +1204,7 @@ def Report(id):
     pdfFile = pdfkit.from_string(rendered, 'case.pdf')
 
     form.subject.data = 'Case#{}_{}'.format(id,clientName)
-    form.email_body.data = 'Fruad Report'
+    form.email_body.data = 'This email is sent by Saudi Money Investigator system'
 
     if form.validate_on_submit():
 
@@ -1206,6 +1241,7 @@ def Report(id):
 
 
 @app.route('/BussinseRuleGuide', methods=['GET','POST'])
+@register_breadcrumb(app, '.BR_GUIDE', 'Business Rules Guide')
 def BR_GUIDE():
 
     if session.get('username') == None:
@@ -1220,7 +1256,13 @@ def BR_GUIDE():
     totalAlert = len(totalAlert)
     print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
-    return render_template('BussinseRuleGuide.html',form2=search_form ,alert = totalAlert)
+
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form,
+                                 alert=totalAlert)))
+    return render_template('BussinseRuleGuide.html',form2 = search_form ,alert = totalAlert)
 
 
 
@@ -1319,9 +1361,73 @@ def keyword():
 
 
     if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
         return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3= form3 , alert = totalAlert)))
 
     return render_template("keyword.html" ,  form2=search_form , form3 = form3 , alert = totalAlert,fileEx=fileEx)
+
+
+
+@app.route("/ClientCases/<id>" , methods=['GET', 'POST'])
+@register_breadcrumb(app, '.ClientCases', 'Client Cases')
+def ClientCases(id):
+
+    # Only logged in users can access bank profile
+    if session.get('username') == None:
+        return redirect(url_for('home'))
+    else:
+
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+
+        cur, db, engine = connection2()
+
+        #Forms
+        form = ViewCasesForm()
+        search_form = SearchForm()
+
+        #totla alert
+
+        query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
+        cur.execute(query)
+        totalAlert = cur.fetchall()
+        totalAlert = len(totalAlert)
+        print(totalAlert)
+        socketio.emit('count-update', {'count': totalAlert})
+
+
+
+        #page code
+        per_page = 4
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        offset = (page - 1) * per_page
+        query = "SELECT * FROM SMI_DB.ClientCase WHERE clientID  =  '" + id + "' "
+        cur.execute(query)
+        total = cur.fetchall()
+        #print(total)
+        cur.execute("SELECT * FROM SMI_DB.ClientCase  WHERE clientID  =  '" + id + "' ORDER BY caseID DESC LIMIT %s OFFSET %s", (per_page, offset))
+        cases = cur.fetchall()
+
+        if search_form.search_submit.data and search_form.validate_on_submit():
+            if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+                search_form.search.data = 0
+            return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
+
+
+        #table form
+        if form.case_submit.data and form.validate_on_submit():
+            id = request.form['caseView']
+            print(id)
+            return redirect((url_for('case', id=id)))
+
+        pagination = Pagination(page=page,per_page = per_page, total= len(total) ,offset = offset , search=search, record_name='cases' , css_framework='bootstrap3')
+
+    return render_template("ClientCases.html", cases=cases, numOfcase=len(cases), form=form, form2=search_form,
+                           pagination=pagination, css_framework='foundation', caseId=0, alert=totalAlert
+                           ,total= len(total))
 
 
 ######CELERY PART #########
@@ -1347,7 +1453,7 @@ def enqueue():
 @app.route('/analysisView')
 #@register_breadcrumb(app, '.manageBankData.analysisView', 'Analysis')
 def analysisView():
-    form2 =SearchForm()
+    search_form = SearchForm()
     cur, db, engine = connection2()
     query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
     cur.execute(query)
@@ -1355,7 +1461,13 @@ def analysisView():
     totalAlert = len(totalAlert)
     print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
-    return render_template("analysisView.html",form2= form2 , alert = totalAlert )
+
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form)))
+
+    return render_template("analysisView.html",form2= search_form , alert = totalAlert )
 
 
 

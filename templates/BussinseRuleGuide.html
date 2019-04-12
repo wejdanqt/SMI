@@ -145,12 +145,12 @@
     </nav>
   </header>
   <!-- Left side column. contains the logo and sidebar -->
- <aside class="main-sidebar">
+  <aside class="main-sidebar"   >
     <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
+    <section class="sidebar"  >
       <!-- Sidebar user panel -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu" data-widget="tree">
+      <ul class="sidebar-menu" data-widget="tree" >
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
@@ -171,18 +171,14 @@
         </li>
 
 
-        <li>
-          <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
-
-          </a>
-        </li>
          <li>
           <a href="{{ url_for('bankP') }}">
             <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
           </a>
         </li>
+
+
 
              <li class="treeview">
           <a href="#">
@@ -198,12 +194,7 @@
 
           </ul>
         </li>
-        <li>
-          <a href="{{ url_for('manageProfile') }}" >
-               <i class="fa fa-edit"></i>
-          <span class="lang" key="edit">Edit Profile</span>
-          </a>
-        </li>
+
 
 
           <li>
@@ -383,9 +374,7 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <footer class="main-footer">
 
-  </footer>
 
   <!-- Control Sidebar -->
   <!-- /.control-sidebar -->
@@ -424,9 +413,11 @@
             'guidePoint3p4' :'Then you write the value you want to check separated by a comma from the operator ',
             'guidePoint3p5': ' If you want to add more rules you should repeat all the steps in number 3, the result should look like this:',
             'guidePoint4' : '4-Adding Sanction List',
-            'guidePoint4p1': 'You can add clients names in sanction list by including them in a separated Keyword, "SanctionList"',
+            'guidePoint4P1': 'You can add clients names in sanction list by including them in a separated Keyword, "SanctionList"',
             'guidePoint5':'5-Adding High risk countries',
-            'guidePoint5p1':'You can high risk countries by including them in a separated Keyword, "HighRiskCountries"'
+            'guidePoint5p1':'You can high risk countries by including them in a separated Keyword, "HighRiskCountries"',
+            'profile': 'Profile',
+            'keyword': 'Keywords Setup'
         },
         'ar' : {
              'home': 'الصفحة الرئيسية',
@@ -452,9 +443,11 @@
             'guidePoint3p4' : 'بعد ذلك يمكنك كتابة القيمة المراد التحقق منها بعد إضافة فاصلة بينها وبين العملية الحسابية',
             'guidePoint3p5' : ':عند الرغبة في إضافة المزيد من اللوائح، يجب عليك أن تكرر جميع الخطوات المندرجه تحت خطوة رقم ٣، النتيجة يجب أن تكون مماثلة لهذا المثال ',
             'guidePoint4' : '٤- إضافة قائمة العقوبات',
-            'guidePoint4p1' : 'يمكنك إضافة أسماء العملاء المدرجة تحت قائمة العقوبات داخل الكلمة المفتاحية "" ',
-            'guidePont5':'٥- إضافة الدول عالية الخطر',
-            'guidePoint5p1': 'يمكنك إضافة الد،ل عالية المخاطر داخل الكلمة المفتاحية "" '
+            'guidePoint4P1' : 'يمكنك إضافة أسماء العملاء المدرجة تحت قائمة العقوبات داخل الكلمة المفتاحية "" ',
+            'guidePoint5':'٥- إضافة الدول عالية الخطر',
+            'guidePoint5p1': 'يمكنك إضافة الد،ل عالية المخاطر داخل الكلمة المفتاحية "" ',
+            'profile': 'الملف الشخصي',
+            'keyword': 'إعدادات كلمات البحث'
         }
     };
     $(function () {

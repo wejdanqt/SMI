@@ -197,12 +197,12 @@ function myFunc() {
           </nav>
         </header>
   <!-- Left side column. contains the logo and sidebar -->
-     <aside class="main-sidebar">
+     <aside class="main-sidebar"   >
     <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
+    <section class="sidebar"  >
       <!-- Sidebar user panel -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu" data-widget="tree">
+      <ul class="sidebar-menu" data-widget="tree" >
         <li class="header">MAIN NAVIGATION</li>
 
         <li class="treeview">
@@ -223,18 +223,14 @@ function myFunc() {
         </li>
 
 
-        <li>
-          <a href="{{ url_for('home') }}">
-            <i class="fa fa-home"></i> <span class="lang" key="home" >Home</span>
-
-          </a>
-        </li>
          <li>
           <a href="{{ url_for('bankP') }}">
             <i class="fa fa-user"></i> <span class="lang" key="profile" >Profile</span>
 
           </a>
         </li>
+
+
 
              <li class="treeview">
           <a href="#">
@@ -250,12 +246,7 @@ function myFunc() {
 
           </ul>
         </li>
-        <li>
-          <a href="{{ url_for('manageProfile') }}" >
-               <i class="fa fa-edit"></i>
-          <span class="lang" key="edit">Edit Profile</span>
-          </a>
-        </li>
+
 
 
           <li>
@@ -317,6 +308,8 @@ function myFunc() {
             <div class="box-body table-responsive no-padding">
              <form  action="{{ url_for('cases') }}" method="post" role="form">
               {{ form.hidden_tag() }}
+
+             <strong style="font-size: 120%;"> &nbsp; Number of Cases found : </strong> <b style="color: #A10303; font-size: 120%;">{{ total }}</b>
               <table class="table table-hover">
                 <tr>
                   <th>Case Id</th>
@@ -334,7 +327,10 @@ function myFunc() {
                   {% endif %}
 
 
-                   {% for case in cases %}
+
+                   {% for case in cases  %}
+
+
                     <tr>
                     <td>{{ case[0] }}</td>
                      <td> {{ case[1] }}</td>

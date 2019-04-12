@@ -36,7 +36,7 @@ class passwordRecovery:
 
 
     def updatePassword(self):
-        cur, db = connection2()
+        cur, db , engine= connection2()
         query = "UPDATE SMI_DB.AMLOfficer SET password ='" + self.newPass  + "' WHERE email = '" + self.clientEmail + "'"
         cur.execute(query)
         db.commit()
