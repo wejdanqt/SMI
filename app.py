@@ -911,7 +911,7 @@ def case(id):
         if client_BR[3] == '1':
             Br_dic['4'] = 'Client exceeded max amount of transaction'
 
-    if client_custom_BR is None:
+    if (client_custom_BR is None) or (not ("1" in client_custom_BR)):
         Custom_BR_flag = False
 
     else:
@@ -927,7 +927,8 @@ def case(id):
     transaction = cur.fetchall()
 
     return render_template("case.html",data= data, data2= data2, label= profileLabel, clientId = client_ID
-                           ,caseId = id ,transaction=transaction, form2=search_form ,alert = totalAlert, Br_flag=Br_flag ,Br_dic=Br_dic,Custom_BR_flag=Custom_BR_flag,Custom_BR=Custom_BR)
+                           ,caseId = id ,transaction=transaction, form2=search_form ,alert = totalAlert, Br_flag=Br_flag ,Br_dic=Br_dic,
+                           Custom_BR_flag=Custom_BR_flag,Custom_BR=Custom_BR)
 
 
 @app.route('/download/<id>', methods=['GET','POST'])
@@ -1019,6 +1020,7 @@ def download(id):
 
 #breadcrumbs
 @app.route("/DatabaseSetup", methods=['GET', 'POST'])
+@register_breadcrumb(app, '.DatabaseSetup', 'Database Setup')
 def DatabaseSetup():
     # Only logged in users can access bank profile
     if session.get('username') == None:

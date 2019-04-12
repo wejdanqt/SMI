@@ -212,7 +212,7 @@ function myFunc() {
           <li>
            <a href="{{ url_for('cases') }}">
                  <i class="fa fa-folder-open"></i>
-          <span class="lang" key="view">View Cases</span>
+          <span class="lang" key="view" >View Cases</span>
             <span class="pull-right-container">
 
             </span>
@@ -287,23 +287,24 @@ function myFunc() {
 
 
               <li class="list-group-item">
-              <b>AML Officer Fullname</b>
+              <b class="lang" key="Aml_name" >AML Officer Fullname</b>
               <p class="pull-right">{{ form2.AML_name.data}}</p>
             </li>
 
 
             <li class="list-group-item">
-              <b>AML Officer username</b>
+              <b class="lang" key="Aml_username" >AML Officer Username</b>
               <p class="pull-right">{{form2.username.data}}</p>
             </li>
 
             <li class="list-group-item">
-              <b>AML Officer Email</b>
+              <b class="lang" key="Aml_email">AML Officer Email</b>
               <p class="pull-right">{{form2.Email.data}}</p>
             </li>
 
           </ul>
-                <a class="btn btn-default" href="/ManageProfile" style="margin-left: 40%">Edit Profile &nbsp; <i class="fa fa-edit"></i></a>
+
+                <a class="btn btn-default lang"  key="btn_profile" href="/ManageProfile" style="margin-left: 40%" >Edit Profile &nbsp; <i class="fa fa-edit"></i> </a>
                 </form>
         <!-- /.box-body -->
       </div>
@@ -341,32 +342,38 @@ function myFunc() {
     var arrLang ={
 
         'en' : {
-            'home': 'Home',
+
             'search': 'Search For Client',
-            'edit': 'Edit Profile',
             'view': 'View Cases',
             'guide': 'Business Rules Guide',
             'set': 'Settings',
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'Aml_name' : 'AML Officer Fullname',
+            'Aml_username' :'AML Officer Username',
+            'Aml_email' :'AML Officer Email',
+            'btn_profile' :'Edit Profile',
 
 
 
 
         },
         'ar' : {
-             'home': 'الصفحة الرئيسية',
+
             'search': 'البحث عن عميل',
-            'edit': 'تعديل الملف الشخصي',
             'view': 'عرض القضايا',
             'guide': 'دليل كتابة اللوائح',
              'set': 'إعدادات',
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+            'Aml_name' : 'الإسم الكامل لضابط مكافحة غسل الأموال',
+            'Aml_username' :'إسم المستخدم لضابط مكافحة غسل الأموال',
+            'Aml_email' :'البريد الإلكتروني لضابط مكافحة غسل الأموال',
+            'btn_profile' :'تعديل الملف الشخصي',
 
         }
     };
