@@ -1204,42 +1204,46 @@ def Report(id):
                                Custom_BR=Custom_BR)
 
     #######save case to working dierctory ##########
-    pdfFile = pdfkit.from_string(rendered, 'case.pdf')
-
-    form.subject.data = 'Case#{}_{}'.format(id,clientName)
-    form.email_body.data = 'This email is sent by Saudi Money Investigator system'
-
-    if form.validate_on_submit():
-
-        target = os.path.join(APP_ROOT, 'Case_file/')
-        print('target',target)
-        if not os.path.isdir(target):
-            os.mkdir(target)
-        file = request.files.get('file_case')
-        try:
-            filename = file.filename
-            print('fileNAME',filename)
-            dest = "/".join([target, filename])
-            print(dest)
-            file.save(dest)
-            fileType= filename.split(".")[0]+"/"+filename.split(".")[1]
-            filename = 'Case_file/'+filename
-        except Exception as e:
-            filename= "case.pdf"
-            fileType = "case/pdf"
 
 
+    try:
+        pdfFile = pdfkit.from_string(rendered, 'case.pdf')
 
+        form.subject.data = 'Case#{}_{}'.format(id,clientName)
+        form.email_body.data = 'This email is sent by Saudi Money Investigator system'
 
-        recipient = form.reciver.data
-        msg = Message(form.subject.data, recipient.split())
-        msg.body = form.email_body.data
-        with app.open_resource(filename) as fp:
-            msg.attach(filename, fileType, fp.read())
-        print(msg)
-        mail.send(msg)
+        if form.validate_on_submit():
 
-        flash('Email has been sent Successfully..', 'success')
+            target = os.path.join(APP_ROOT, 'Case_file/')
+            print('target',target)
+            if not os.path.isdir(target):
+                os.mkdir(target)
+            file = request.files.get('file_case')
+            try:
+                filename = file.filename
+                print('fileNAME',filename)
+                dest = "/".join([target, filename])
+                print(dest)
+                file.save(dest)
+                fileType= filename.split(".")[0]+"/"+filename.split(".")[1]
+                filename = 'Case_file/'+filename
+            except Exception as e:
+                filename= "case.pdf"
+                fileType = "case/pdf"
+
+            recipient = form.reciver.data
+            msg = Message(form.subject.data, recipient.split())
+            msg.body = form.email_body.data
+            with app.open_resource(filename) as fp:
+                msg.attach(filename, fileType, fp.read())
+            print(msg)
+            mail.send(msg)
+            flash('Email has been sent Successfully..', 'success')
+            return render_template("email.html", form=form, clientID=id, alert=totalAlert, form2=search_form)
+
+    except Exception as e:
+        flash('Please connect to the Internet..', 'danger')
+
     return render_template("email.html", form = form, clientID= id , alert = totalAlert , form2=search_form )
 
 

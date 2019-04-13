@@ -5,16 +5,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title> SMI | Login </title>
   <!-- Tell the browser to be responsive to screen width -->
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+ <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
+
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+
+
+
    <link href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
   <!-- Font Awesome -->
    <link href="{{ url_for('static', filename='bower_components/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
   <!-- Theme style -->
   <link href="{{ url_for('static', filename='dist/css/AdminLTE.min.css') }}" rel="stylesheet">
-  <!-- AdminLTE Skins. Choose a skin from the css/skins
-       folder instead of downloading all of them to reduce the load. -->
-   <link href="{{ url_for('static', filename='dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
+
+    <link href="{{ url_for('static', filename='dist/css/skins/_all-skins.min.css') }}" rel="stylesheet">
 
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -86,13 +92,11 @@
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top"  >
       <!-- Sidebar toggle button-->
-
-
-
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
 
                 <!-- Start Translation code -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
                <!-- End Translation code -->
           <li>
@@ -102,14 +106,30 @@
           <li>
               <a href="{{ url_for('register') }}">Register</a>
           </li>
+            <!-- language selection -->
 
-                  <li>
-  <a class="translate" id ="en"  >English</a>
+                   <li class="dropdown notifications-menu">
+                  <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                    <span>Select language</span>
+                  </a>
+                  <ul class="dropdown-menu">
 
+                    <li>
+                      <!-- inner menu: contains the actual data -->
+                      <ul class="menu">
+
+                        <li>
+                          <a class="translate" id ="en"  >English</a>
+                        </li>
+
+                           <li>
+                   <a class="translate" id ="ar" >Arabic</a>
         </li>
-        <li>
-            <a class="translate" id ="ar" >Arabic</a>
-        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+            <!-- ---------------------------------- -->
 
         </ul>
       </div>
@@ -204,6 +224,7 @@
 <!-- jQuery 3 -->
 </div>
 </div>
+
 
 
 <script>
