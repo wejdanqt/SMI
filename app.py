@@ -603,7 +603,7 @@ def manageBankData():
             #default selectd countires in case the user didn't select any FATF
             if len(risk_countries) == 0:
                 print("Risk countries", len(risk_countries))
-                risk_countries = ['Bahamas' , 'Botswana' , 'Cambodia' , 'Democratic Peoples Republic of Korea (DPRK)'
+                risk_countries = ['Bahamas' , 'Botswana' , 'Cambodia' , 'Democratic Peoples Republic of Korea'
                                   , 'Ethiopia' , 'Ghana' , 'Iran' , 'Pakistan' , 'Serbia' , 'Sri Lanka'
                                   , 'Syria' , 'Trinidad and Tobago' , 'Tunisia' , 'Yemen']
 

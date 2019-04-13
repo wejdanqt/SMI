@@ -130,7 +130,7 @@ class manageBankDataForm(FlaskForm):
       ('Comoros', 'Comoros'), ('Congo', 'Congo'), ('Congo, the Democratic Republic of the', 'Congo, the Democratic Republic of the'),
       ('Cook Islands', 'Cook Islands'), ('Costa Rica', 'Costa Rica'), ('Côte d Ivoire', 'Côte d Ivoire'), ('Croatia', 'Croatia'),
       ('Cuba', 'Cuba') , ('Curaçao', 'Curaçao') , ('Cyprus', 'Cyprus') , ('Czech Republic', 'Czech Republic') , ('Denmark', 'Denmark') , ('Djibouti', 'Djibouti')
-      , ('Dominica', 'Dominica') , ('Dominican Republic', 'Dominican Republic') , ('Ecuador', 'Ecuador') , ('Egypt', 'Egypt') , ('El Salvador', 'El Salvador') , ('Equatorial Guinea', 'Equatorial Guinea')
+      , ('Dominica', 'Dominica') , ('Dominican Republic', 'Dominican Republic'), ('Democratic Peoples Republic of Korea' , 'Democratic Peoples Republic of Korea') , ('Ecuador', 'Ecuador') , ('Egypt', 'Egypt') , ('El Salvador', 'El Salvador') , ('Equatorial Guinea', 'Equatorial Guinea')
       , ('Eritrea', 'Eritrea'), ('Estonia', 'Estonia'), ('Ethiopia', 'Ethiopia'), ('Falkland Islands (Malvinas)', 'Falkland Islands (Malvinas)'), ('Faroe Islands', 'Faroe Islands'),
       ('Fiji', 'Fiji'), ('Finland', 'Finland'), ('France', 'France'), ('French Guiana', 'French Guiana'), ('French Polynesia', 'French Polynesia'), ('French Southern Territories', 'French Southern Territories'),
       ('Gabon', 'Gabon'), ('Gambia', 'Gambia'), ('Georgia', 'Georgia'), ('Germany', 'Germany'), ('Ghana', 'Ghana'), ('Gibraltar', 'Gibraltar'), ('Greece', 'Greece'), ('Greenland', 'Greenland'), ('Grenada', 'Grenada'),
