@@ -311,9 +311,16 @@ function myFunc() {
 
           <ul class="list-group list-group-unbordered">
             <li class="list-group-item">
-              <b>{{ clientForm.clientID.label() }}</b> <p class="pull-right">{{clientForm.clientID.data}}</p>
+              <b>{{ clientForm.clientID.label() }}</b> <p >{{clientForm.clientID.data}}</p>
+
+
             </li>
 
+               <li class="list-group-item">
+              <b>{{ clientForm.avg.label() }}</b> <p>{{clientForm.avg.data}}</p>
+
+
+            </li>
           </ul>
         <!-- /.box-body -->
       </div>

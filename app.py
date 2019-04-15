@@ -173,8 +173,8 @@ def register():
             return render_template('Register.html', form=form)
         else:
 
-            query = "INSERT INTO AMLOfficer (userName, email, fullname, password) VALUES(%s,%s,%s,%s)"
-            val = (form.username.data, form.email.data, form.fullName.data, form.password.data)
+            query = "INSERT INTO AMLOfficer (userName, email, fullname, password , bankName) VALUES(%s,%s,%s,%s, %s)"
+            val = (form.username.data, form.email.data, form.fullName.data, form.password.data , form.bankName.data)
             cur.execute(query, val)
             db.commit()
             cur.close()
@@ -333,6 +333,18 @@ def clientProfile(id):
                 profileLabel = 'label label-danger'
             else: # Low
                 profileLabel = 'label label-primary'
+
+        # Retrive client avg from database:
+        query = "SELECT * FROM Bank_DB.transaction WHERE clientID = '" + id + "'"
+        cur.execute(query)
+        record2 = cur.fetchall()
+        for column in record2:
+            client_form.avg.data = column[12]
+
+
+
+
+
 
 
         #Retreive old comments
@@ -510,6 +522,8 @@ def manageBankData():
     search_form = SearchForm()
     form3 = uploadForm()
 
+
+
     #alert code
     cur, db, engine = connection2()
     query = "SELECT * FROM SMI_DB.ClientCase WHERE viewed ='1'"
@@ -545,8 +559,11 @@ def manageBankData():
 
     if form.bank_submit.data and form.validate_on_submit():
 
+        print('Democratic People\'s Republic of Korea')
+
         ## check if there's prevoius BR and confirm to update it
         #print()
+
         target = os.path.join(APP_ROOT, 'br_file/')
         #print(target)
         if not os.path.isdir(target):
@@ -603,7 +620,7 @@ def manageBankData():
             #default selectd countires in case the user didn't select any FATF
             if len(risk_countries) == 0:
                 print("Risk countries", len(risk_countries))
-                risk_countries = ['Bahamas' , 'Botswana' , 'Cambodia' , 'Democratic Peoples Republic of Korea'
+                risk_countries = ['Bahamas' , 'Botswana' , 'Cambodia' , 'Democratic People\'s Republic of Korea'
                                   , 'Ethiopia' , 'Ghana' , 'Iran' , 'Pakistan' , 'Serbia' , 'Sri Lanka'
                                   , 'Syria' , 'Trinidad and Tobago' , 'Tunisia' , 'Yemen']
 

@@ -147,9 +147,23 @@
                   </ul>
                 </li>
 
-          <li>
-          <a href="/logout"><i class="fa fa-sign-out"></i></a>
+
+                   <li>
+                  <a id = 'log' onclick="myFunc()" >Logout &nbsp; <i class="fa fa-sign-out"></i></a>
+
+
           </li>
+
+        <script>
+function myFunc() {
+  var r = confirm("Are you sure you want to logout?");
+  if (r === true) {
+      var a = document.getElementById('log');
+      a.href = "/logout"
+  }
+}
+</script>
+
 
 
         </ul>

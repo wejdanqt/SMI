@@ -53,7 +53,7 @@ class GeneralSearch:
         PRODUCT = 'fullarchive'
         LABEL = 'TestSMI'
         SANDBOX_CONSUMER_KEY = 'JR6dkIC3Cm0E9iQiFQQnRQDXl'
-        SANDBOX_CONSUMER_SECRET = 'zbhilbf0TpELOLvmmx83LgcYYG3p9hWqvOnJGGuY75XyeI0DIm'
+        SANDBOX_CONSUMER_SECRET = 'zbhilbf0TpELOLvmmx83LgcYYG3p9hWqvOnJGGuY75XyeI0DIm '
         SANDBOX_TOKEN_KEY = '557269145-mDE9g2ern37MjnzUQO3e8PeRpiteF3jd8RSgJuGd'
         SANDBOX_TOKEN_SECRECT = 'I1d8sI0pVC4TdDDdohCy1WgZ2GvZOgkJx7C5FBenIvrDL'
 

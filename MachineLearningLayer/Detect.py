@@ -44,6 +44,8 @@ class Detection:
         classifier.DecisionTreeClassifier()
 
 
+
+
         #MULTI CERTIREA
 
         #Create profiles
