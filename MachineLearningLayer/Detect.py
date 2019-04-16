@@ -95,7 +95,7 @@ class Detection:
             if (name in s for s in suspsuoiusClient):#counter for the number of suspsuoius transactions
                 NumberOfRecord = NumberOfRecord+1
 
-            if NumberOfRecord < 1:
+            if NumberOfRecord > 1:
                 weightTree = 0.75
 
             try:
