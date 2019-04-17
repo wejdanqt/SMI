@@ -533,6 +533,10 @@ def manageBankData():
     print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
 
+    if search_form.search_submit.data and search_form.validate_on_submit():
+        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
+            search_form.search.data = 0
+        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3=form3) ))
 
     status, cur, db, engine = BankConnection()
     operands = ['==', 'not', 'or', 'in', 'and', '<', '>', '<=', '>=']
@@ -542,9 +546,14 @@ def manageBankData():
               'danger')
         return render_template("ManageBankData.html", form=form, form2=search_form,
                                form3=form3 , alert = totalAlert)
+    try:
+        fb = firebase.database()
+        isFB_Connected = fb.child().get().val()
+    except Exception as e:
+        flash('Please connect to the Internet..', 'danger')
+        return render_template("ManageBankData.html", form=form, form2=search_form,
+                               form3=form3 , alert = totalAlert)
 
-    fb = firebase.database()
-    isFB_Connected = fb.child().get().val()
 
 
 
@@ -651,11 +660,6 @@ def manageBankData():
         return redirect((url_for('manageBankData', form=form, form2=search_form, form3=form3,
                                  FB_flag=FB_flag , alert = totalAlert)))
 
-
-    if search_form.search_submit.data and search_form.validate_on_submit():
-        if search_form.search.data in [''] or search_form.search.data[0] in ['/', "\\"]:
-            search_form.search.data = 0
-        return redirect((url_for('searchResult', id=search_form.search.data, form2=search_form , form3=form3) ))
 
 
     # upload BR
@@ -771,18 +775,15 @@ def manageBankData():
                     fb.child('Rules').child('Rule' + str(i)).set(data['Rules']['Rule' + str(i)])
                     i=i+1
 
-                    # treger code
-                    if status == 0:
-                        task = Analysis.delay(1)
-                        form2 = SearchForm()
-                        flash('Successfully uploaded your business rules..', 'success')
-                        return render_template('analysisView.html', JOBID=task.id, form2=form2, alert=totalAlert)
-
-
-
-
             except Exception as e :
                 print(e)
+
+    # treger code
+        if status == 0:
+            task = Analysis.delay(1)
+            form2 = SearchForm()
+            flash('Successfully uploaded your business rules..', 'success')
+            return render_template('analysisView.html', JOBID=task.id, form2=form2, alert=totalAlert)
 
     #retrive from firbase
     amount = fb.child('Rule3').child('suspiciousTransaction').child('amount').get().val()

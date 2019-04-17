@@ -296,7 +296,7 @@ function myFunc() {
 
       <div class="col-md-9 personal-info">
         <h3 style="color:#004D40;"> <b>Database info</b></h3>
-      <p>You have to setup you'r database connection by filling you'r local database information.</p>
+      <p>You have to setup your database connection by filling your local database information.</p>
       <hr>
 
         <form action="" method="post" class="form-horizontal" role="form" {% if status==0 %}
@@ -426,18 +426,42 @@ function myFunc() {
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
+       // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
-            });
+}
 
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 
