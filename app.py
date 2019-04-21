@@ -332,7 +332,7 @@ def clientProfile(id):
             elif column[2] == 'High':  # High
                 profileLabel = 'label label-danger'
             else: # Low
-                profileLabel = 'label label-primary'
+                profileLabel = 'label label-warning'
 
         # Retrive client avg from database:
         query = "SELECT * FROM Bank_DB.transaction WHERE clientID = '" + id + "'"
@@ -530,7 +530,6 @@ def manageBankData():
     cur.execute(query)
     totalAlert = cur.fetchall()
     totalAlert = len(totalAlert)
-    print(totalAlert)
     socketio.emit('count-update', {'count': totalAlert})
 
     if search_form.search_submit.data and search_form.validate_on_submit():
@@ -561,14 +560,10 @@ def manageBankData():
 
     if not (isFB_Connected is None):
         FB_flag = 1
-    print('isFB_Connected', FB_flag)
 
-    print(form.bank_submit.data)
-    print(form.validate_on_submit())
 
     if form.bank_submit.data and form.validate_on_submit():
 
-        print('Democratic People\'s Republic of Korea')
 
         ## check if there's prevoius BR and confirm to update it
         #print()
@@ -581,7 +576,7 @@ def manageBankData():
         file = request.files.get('file_br')
         #print(file)
         filename = file.filename
-        print(filename)
+
 
         if filename.split(".", 1)[1] != 'txt':
             file_exttintion_txt = 1
@@ -590,7 +585,6 @@ def manageBankData():
 
         else:
             dest = "/".join([target, filename])
-            print(dest)
             file.save(dest)
 
             ### get names entered by user ###
@@ -599,7 +593,6 @@ def manageBankData():
             for line in f:
                 user_sanction_list.append(line.rstrip('\n'))
 
-            print('length of user words', len(user_sanction_list))
 
             #### If the is empty ####
             if len(user_sanction_list) == 0:
@@ -628,7 +621,6 @@ def manageBankData():
             risk_countries = form.risk_countries.data
             #default selectd countires in case the user didn't select any FATF
             if len(risk_countries) == 0:
-                print("Risk countries", len(risk_countries))
                 risk_countries = ['Bahamas' , 'Botswana' , 'Cambodia' , 'Democratic People\'s Republic of Korea'
                                   , 'Ethiopia' , 'Ghana' , 'Iran' , 'Pakistan' , 'Serbia' , 'Sri Lanka'
                                   , 'Syria' , 'Trinidad and Tobago' , 'Tunisia' , 'Yemen']
@@ -664,21 +656,16 @@ def manageBankData():
 
     # upload BR
     if form3.submitRule.data and form3.validate_on_submit():
-        print('iam in manage data')
         target = os.path.join(APP_ROOT, 'Br_User/')
-        print(target)
         if not os.path.isdir(target):
             os.mkdir(target)
 
         file1 = request.files.get('file_br')
-        print(file1)
         if file1 is None:
             return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
                                    FB_flag=FB_flag,
                                    is_Br_submitted=1 , alert = totalAlert)
         filename = file1.filename
-        print(filename)
-
         if filename.split(".", 1)[1] != 'json':
             file_exttintion_json = 1
             return render_template("ManageBankData.html", form=form, form2=search_form, form3=form3,
@@ -687,14 +674,13 @@ def manageBankData():
 
         else:
             dest = "/".join([target, filename])
-            print(dest)
             file1.save(dest)
             cur.execute("SELECT * FROM Bank_DB.transaction LIMIT 1")
             try:
                 with open(dest) as f:
                     data = json.load(f)
 
-                print(data)
+
             except Exception as e:
                 flash('Sorry...your file is not well structured... please follow the file format in the sample',
                       'danger')
@@ -1228,10 +1214,10 @@ def Report(id):
         pdfFile = pdfkit.from_string(rendered, 'case.pdf')
 
         form.subject.data = 'Case#{}_{}'.format(id,clientName)
-        form.email_body.data = 'This email is sent by Saudi Money Investigator system'
+        form.email_body.data = 'This email is sent by Saudi Money Investigator System'
+
 
         if form.validate_on_submit():
-
             target = os.path.join(APP_ROOT, 'Case_file/')
             print('target',target)
             if not os.path.isdir(target):

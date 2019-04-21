@@ -1,7 +1,0 @@
-IF clientName in black_list THEN riskFlag = 1
-IF location_origin or location_Dest in high_risk_countries THEN riskFlag =+1
-IF transaction > average_transaction *1.5 THEN riskFlag =+1
-IF transaction > 50000 and transaction == 'Cash-IN' THEN riskFlag =+1
-
-
-
