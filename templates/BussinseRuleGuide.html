@@ -127,7 +127,7 @@
           <!-- Control Sidebar Toggle Button -->
         <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select">Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -436,7 +436,8 @@ function myFunc() {
             'guidePoint5':'5-Adding High risk countries',
             'guidePoint5p1':'You can high risk countries by including them in a separated Keyword, "HighRiskCountries"',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'select' : 'Select language',
         },
         'ar' : {
              'home': 'الصفحة الرئيسية',
@@ -466,17 +467,47 @@ function myFunc() {
             'guidePoint5':'٥- إضافة الدول عالية الخطر',
             'guidePoint5p1': 'يمكنك إضافة الد،ل عالية المخاطر داخل الكلمة المفتاحية "" ',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+            'select' : 'اختر اللغة',
         }
     };
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
-                $(this).text(arrLang[lang][$(this).attr('key')]);
-            });
+
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
+
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
+
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
-    });
+
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 </script>
 
 

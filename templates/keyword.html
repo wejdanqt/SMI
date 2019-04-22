@@ -140,7 +140,7 @@
 
             <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select" >Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -308,7 +308,7 @@ function myFunc() {
           <!-- general form elements -->
           <div class="box box-default" style="margin-left:25%;">
             <div class="box-header with-border">
-              <h3 class="box-title">Keywords Setup</h3>
+              <h3 class="box-title lang" key="setK" >Keywords Setup</h3>
             </div>
             <!-- /.box-header -->
             <!-- form start -->
@@ -321,7 +321,7 @@ function myFunc() {
             <div >
                    <div class="form-group">
 
-                       <h7 class="col-md-3 control-label">Upload Keywords:</h7>
+                       <h7 class="col-md-3 control-label lang" key="upload" >Upload Keywords:</h7>
                    <div class="col-md-8">
 
 
@@ -329,7 +329,7 @@ function myFunc() {
                          <p class="help-block">file extention, .txt</p>
                        {% if fileEx==1 %} <p class="help-block" style="color:red;">file extension must be .txt</p>{% endif %}
 
-                      <p class="help-block"><b style="color: #A10303">*</b>Each keyword must be separated by a new line in a txt file.</p>
+                      <p class="help-block lang" key ='guide_key'><b style="color: #A10303">*</b>Each keyword must be separated by a new line in a txt file.</p>
 
 
                     </div>
@@ -413,7 +413,11 @@ function myFunc() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'upload' : 'Upload Keywords:',
+            'select' : 'Select language',
+            'setK' : 'Keywords Setup',
+            'guide_key': '*Each keyword must be separated by a new line in a txt file.'
 
 
 
@@ -429,23 +433,53 @@ function myFunc() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+            'upload' : 'رفع كلمات البحث',
+            'select' : 'اختر اللغة',
+            'setK' : 'إعدادات كلمات البحث',
+            'guide_key': '*كل كلمة يجب ان تفصل بسطر جديد في الملف'
+
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-            });
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 

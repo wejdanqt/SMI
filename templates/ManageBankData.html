@@ -201,7 +201,7 @@
 
             <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select">Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -383,8 +383,12 @@ function myFunc() {
                     {{ form.hidden_tag() }}
 
               <div class="box-body">
-              <input type="radio" name="tab" value="igotnone" onclick="show1();" /> Business Rules Template &ensp; &ensp; &ensp;
-                  <input type="radio" name="tab" value="igottwo" onclick="show2();" /> Upload Business Rule
+                  <input type="radio" name="tab" value="igotnone" onclick="show1();" /> <label class="lang" key="temp" > Business Rules Template</label>
+
+               &nbsp; &nbsp; &nbsp;
+
+                 <input type="radio" name="tab" value="igottwo" onclick="show2();"/> <label class="lang" key="upload_br_file" >Upload Business Rule</label>
+
                   <hr>
 
                  <!-- Business Rules Sample -->
@@ -393,13 +397,13 @@ function myFunc() {
                    <div  style="display: none" id="div2">
                        <!-- For inserting black list names -->
                     <div class="form-group">
-                        {{ form.sanction_list.label(class="col-md-3 control-label") }}
+                    <label class="col-md-3 control-label lang" key="sanction">Upload Sanction List:</label>
                    <div class="col-md-8">
                        <!-- Select input form -->
                        <input name='file_br' type="file" accept="Br_file/*"  required/>
                    <!--  <input type="file" id="exampleInputFile"  > -->
                   <p class="help-block">file extension, .txt</p>
-                   <p class="help-block"><b style="color: #A10303">*</b>Each name must be separated by a new line in a
+                   <p class="help-block lang" key="sanction_guide"><b style="color: #A10303">*</b>Each name must be separated by a new line in a
                    txt file.</p>
 
                         {% if file_exttintion_txt ==1 %} <p class="help-block" style="color:red;">file extension must be .txt</p>{% endif %}
@@ -412,13 +416,14 @@ function myFunc() {
                        <!-- High Risk Countries -->
 
                         <div class="form-group">
-                             {{ form.risk_countries.label(class="col-md-3 control-label" ) }}
+                            <label class="col-md-3 control-label lang" key="high">High Risk Countries:</label>
+
                    <!-- <label class="col-md-3 control-label" style="text-align:left;">High Risk countries:</label>-->
                    <div class="col-md-8">
 
                                 {{ form.risk_countries( id='testSelect1' ) }}
 
-                       <p class="help-block"><b>*</b>Select high risk countries,
+                       <p class="help-block lang" key="high_guide"><b>*</b>Select high risk countries,
                            if there are no selection a high risk countries from FATF list will be selected.</p>
 
 
@@ -442,23 +447,25 @@ function myFunc() {
 
                        <div class="form-group">
 
-                         {{ form.exceed_avg_tran.label(class="col-md-3 control-label") }}
+                       <label class="col-md-3 control-label lang" key="avg">Percentage of Exceeding Average Transactions:</label>
+
                    <div class="col-md-8">
                        {{ form.exceed_avg_tran }}
-                       <p class="help-block"><b>*</b>The percentage that the client can't
+                       <p class="help-block lang" key="avg_guide" ><b>*</b>The percentage that the client can't
                        exceed according to his average transaction, <br> <b style="color: #141a1d">I.e</b> flag the client that exceeds his average transactions by 150%.</p>
-                       <p><b style="color: #A10303">Note: </b> Value 1 is equal to 100% , 1.5 equal to 150%...</p>
+                       <p class="lang" key="note"><b style="color: #A10303">Note: </b> Value 1 is equal to 100% , 1.5 equal to 150%...</p>
                     </div>
                       </div>
 
                       <hr>
                             <!-- Suspicious Transaction   -->
                        <div class="form-group">
-                      {{ form.amount.label(class="col-md-3 control-label" ) }}
+                           <label class="col-md-3 control-label lang" key="amount">Maximum transaction amount:</label>
+
                    <div class="col-md-8">
 
                        {{ form.amount}}
-                       <p class="help-block"><b>*</b>The maximum amount allowed per transaction.</p>
+                       <p class="help-block lang" key="amount_guide"><b>*</b>The maximum amount allowed per transaction.</p>
 
 
                     </div>
@@ -483,7 +490,7 @@ function myFunc() {
             <div  id="div1" style="display: none" >
                    <div class="form-group">
 
-                       <h7 class="col-md-3 control-label">Uplaod Bussinse Rules:</h7>
+                       <h7 class="col-md-3 control-label lang" key="up">Upload Business Rules:</h7>
                    <div class="col-md-8">
 
 
@@ -593,7 +600,26 @@ function myFunction() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'select' : 'Select language',
+            'temp' : 'Business Rules Template',
+            'upload_br_file' : 'Upload Business Rule',
+
+            'sanction': 'Upload Sanction List:',
+            'high' : 'High Risk Countries:',
+            'avg' : 'Percentage of Exceeding Average Transactions:',
+            'amount' : 'Maximum transaction amount:',
+
+            'sanction_guide': '*Each name must be separated by a new line in a txt file.',
+            'high_guide' : '*Select high risk countries,\n' +
+                '                           if there are no selection a high risk countries from FATF list will be selected.',
+            'avg_guide' : 'The percentage that the client can\'t\n' +
+                '                       exceed according to his average transaction, I.e flag the client that exceeds his average transactions by 150%. ',
+            'amount_guide' : '*The maximum amount allowed per transaction.',
+            'note': 'Note: Value 1 is equal to 100% , 1.5 equal to 150% and so on',
+             'up': 'Upload Business Rules:',
+
+
 
 
 
@@ -609,23 +635,62 @@ function myFunction() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+             'select' : 'اختر اللغة',
+             'temp' : 'قالب لوائح العمل',
+             'upload_br_file' : 'رفع لوائح العمل',
+             'sanction': ' قائمة المشبوهين',
+            'high' : 'البلدان عالية الخطورة',
+            'avg' : 'النسبة المئوية لتجاوز متوسط ​​الحوالة',
+            'amount' : 'الحد الأقصى لمبلغ الحوالة',
+            'sanction_guide': '* يجب فصل كل اسم بسطر جديد في ملف txt.',
+            'high_guide' : 'حدد البلدان ذات الخطورة العالية ، إذا لم يكن هناك اختيار ، فسيتم اختيار البلدان ذات الخطورة العالية من قائمة FATF.',
+            'avg_guide' : 'النسبة المئوية التي لا يمكن للعميل تجاوزها وفقًا لمتوسط حوالاته ، بمعنى أنه يشير إلى العميل الذي يتجاوز متوسط ​​معاملاته بنسبة 150٪',
+            'amount_guide' : '* الحد الأقصى للمبلغ المسموح به لكل حوالة',
+            'note': 'ملاحظة: القيمة 1 تساوي 100٪ و 1.5 تساوي 150٪ وما إلى ذلك',
+            'up': 'رفع لوائح العمل',
+
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-            });
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 

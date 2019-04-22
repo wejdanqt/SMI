@@ -166,7 +166,7 @@
                 <!-- Control Sidebar Toggle Button -->
                     <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select">Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -189,7 +189,7 @@
           <li>
 
                   <li>
-                  <a id = 'log' onclick="myFunc()" ><i class="fa fa-sign-out"></i></a>
+                  <a id = 'log' onclick="myFunc()" >Logout &nbsp; <i class="fa fa-sign-out"></i></a>
 
 
           </li>
@@ -320,15 +320,15 @@ function myFunc() {
 
             <div class="box-body table-responsive no-padding">
              <form  action="{{ url_for('cases') }}" method="post" role="form">
-                 <strong style="font-size: 120%;"> &nbsp; Number of Cases found : </strong> <b style="color: #A10303; font-size: 120%;">{{ total }}</b>
+                 &nbsp;<strong style="font-size: 120%;" class="lang" key="num"> &nbsp; Number of Cases found : </strong> <b style="color: #A10303; font-size: 120%;">{{ total }}</b>
 
               {{ form.hidden_tag() }}
               <table class="table table-hover">
                 <tr>
-                  <th>Case Id</th>
-                    <th>Case Classification</th>
-                    <th>Date</th>
-                  <th>Action</th>
+                  <th class="lang" key="case_id">Case Id</th>
+                    <th class="lang" key="case_class">Case Classification</th>
+                    <th class="lang" key="date" >Date</th>
+                  <th class="lang" key="action" >Action</th>
                 </tr>
                 <!-- tr problem -->
                     {% if  numOfcase == 0 %}
@@ -408,7 +408,14 @@ function myFunc() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'select' : 'Select language',
+             'date' : 'Date',
+             'action' : 'Action',
+            'case_class' : 'Case Classification',
+             'case_id' : 'Case Id ',
+               'view_case' : 'View Case',
+             'num': 'Number of Cases Found:',
 
 
 
@@ -424,23 +431,55 @@ function myFunc() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+            'select' : 'اختر اللغة',
+             'date' : 'التاريخ',
+             'action' : 'الإجراء',
+            'case_class' : 'تصنيف القضية',
+            'case_id' : 'رقم القضية',
+              'view_case' : 'عرض القضية',
+             'num': 'عدد القضايا التي تم العثور عليها:',
+
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
-            });
+}
 
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 

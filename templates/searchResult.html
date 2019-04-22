@@ -132,7 +132,7 @@
           <!-- Control Sidebar Toggle Button -->
          <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select">Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -294,16 +294,16 @@ function myFunc() {
               {{ form.hidden_tag() }}
               <table class="table table-hover">
                 <tr>
-                  <th>Client ID</th>
-                  <th>Client Name</th>
-                  <th>Action</th>
+                  <th class="lang" key="client_id">Client ID</th>
+                  <th class="lang" key="client_name">Client Name</th>
+                  <th class="lang" key="action">Action</th>
                   </tr>
 
 
                        {% if  NoResult == 0 %}
 
                     <tr>
-                   <td><p style="margin-left: 1%; font-size: 140%; color: darkred " >No search result</p></td>
+                   <td><p style="margin-left: 1%; font-size: 140%; color: darkred " class="lang" key="no" >No search result</p></td>
 
                     </tr>
                   {% endif %}
@@ -362,7 +362,13 @@ function myFunc() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+              'select' : 'Select language',
+              'no' : 'No search result',
+            'client_id' : 'Client ID',
+            'client_name' : 'Client Name',
+            'action' : 'Action',
+
 
 
 
@@ -378,23 +384,56 @@ function myFunc() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+             'select' : 'اختر اللغة',
+            'no' : 'لم يتم العثور على أي نتائج',
+            'client_id' : 'رقم العميل',
+            'client_name' : 'إسم العميل',
+            'action' : 'الإجراء',
+
+
+
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-            });
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 

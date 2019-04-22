@@ -443,6 +443,8 @@ def manageProfile():
     form = bankProfileForm()
     search_form = SearchForm()
     username = session.get('username')
+    email = session.get('email')
+    print(email[0])
     if session.get('username') == None:
         return redirect(url_for('home'))
 
@@ -456,9 +458,10 @@ def manageProfile():
     socketio.emit('count-update', {'count': totalAlert})
 
     if form.profile_submit.data and form.validate_on_submit():
+
         cursor.execute("SELECT * FROM AMLOfficer WHERE email = '" + form.email.data + "'")
         data2 = cursor.fetchone()
-        if not ((data2 is None)) and (data2[0] != username):
+        if  (not(data2 is None)) and (data2[1] != email[0]):
             flash('This Email is already used by another user please try another email', 'danger')
             return render_template('ManageProfile.html', form=form , form2 = search_form , alert = totalAlert)
         else:

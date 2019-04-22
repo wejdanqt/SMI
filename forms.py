@@ -156,7 +156,7 @@ class manageBankDataForm(FlaskForm):
       ('Tunisia', 'Tunisia'), ('Turkey', 'Turkey'), ('Turkmenistan', 'Turkmenistan'), ('Turks and Caicos Islands', 'Turks and Caicos Islands'), ('Tuvalu', 'Tuvalu'), ('Uganda', 'Uganda'), ('Ukraine', 'Ukraine'), ('United Arab Emirates', 'United Arab Emirates'),
       ('United Kingdom', 'United Kingdom'), ('United States', 'United States'), ('United States Minor Outlying Islands', 'United States Minor Outlying Islands'), ('Uruguay', 'Uruguay'), ('Uzbekistan', 'Uzbekistan') , ('Vanuatu', 'Vanuatu'), ('Venezuela', 'Venezuela')
       , ('Viet Nam', 'Viet Nam'), ('Virgin Islands, British', 'Virgin Islands, British'), ('Virgin Islands, U.S.', 'Virgin Islands, U.S.'), ('Wallis and Futuna', 'Wallis and Futuna'), ('Western Sahara', 'Western Sahara') , ('Yemen', 'Yemen'), ('Zambia', 'Zambia'), ('Zimbabwe', 'Zimbabwe')])
-    exceed_avg_tran = FloatField('Percentage of Exceeding Average Transactions :', validators= [DataRequired()] , widget=html5.NumberInput(step="any" , min = 1) )
+    exceed_avg_tran = FloatField('Percentage of Exceeding Average Transactions:', validators= [DataRequired()] , widget=html5.NumberInput(step="any" , min = 1) )
     #type = SelectField('Type: ' , choices=[('Transfer', 'Transfer') , ('Cash out', 'Cash out')])
     amount = FloatField(' Maximum transaction amount:' ,validators= [DataRequired()] ,  widget=html5.NumberInput(step="any" , min = 1 ))
     bank_submit = SubmitField('Upload')

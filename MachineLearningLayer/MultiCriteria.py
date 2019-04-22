@@ -83,7 +83,7 @@ class MultiCriteria:
             # business rule 3
             self.max_amount = filtered_df_['amount'].max()
             self.avg_amount = filtered_df_['amount'].mean()
-            if self.max_amount > (self.avg_amount*exceed_avg_tran):
+            if self.max_amount > ((self.avg_amount*exceed_avg_tran) + self.avg_amount):
                 flag3 = 1
                 self.suspiciousTransactions2 = filtered_df_.loc[(filtered_df_['amount'] == self.max_amount)]
                 self.savingTransaction()

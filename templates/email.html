@@ -125,7 +125,7 @@
 
            <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select" >Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -291,7 +291,8 @@ function myFunc() {
         <form action="{{ url_for('Report',id=clientID) }}" role="form" method="post" id="reused_form" enctype="multipart/form-data" >
                     {{ form.hidden_tag() }}
             <div class="form-group">
-                   {{ form.reciver.label(class="form-control-label") }}
+            <label class="form-control-label lang" key="to">To:</label>
+
                  {% if form.reciver.errors %}
                         {{ form.reciver(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -304,7 +305,7 @@ function myFunc() {
                     {% endif %}
             </div>
               <div class="form-group">
-                {{ form.subject.label(class="form-control-label") }}
+               <label class="form-control-label lang" key="sub">Subject:</label>
                  {% if form.subject.errors %}
                         {{ form.subject(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -319,7 +320,7 @@ function myFunc() {
             </div>
 
             <div class="form-group">
-                 {{ form.email_body.label(class="form-control-label") }}
+               <label class="form-control-label lang" key="msg">Message:</label>
                  {% if form.email_body.errors %}
                         {{ form.email_body(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -332,7 +333,7 @@ function myFunc() {
                     {% endif %}
             </div>
             <div class="form-group">
-                <p class="form-control-label"> <b>Attachment:</b></p>
+                <p class="form-control-label lang" key="attach"> <b>Attachment:</b></p>
                   <input name='file_case' type="file"  accept="Case_file/*" style=" color:transparent;"
                   id="aa" onchange="pressed()"/>
                 <p id="fileLabel">case.pdf</p>
@@ -411,7 +412,14 @@ function myFunc() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'select' : 'Select language',
+            'to' : 'To:',
+            'sub': 'Subject:',
+            'msg': 'Message:',
+            'attach': 'Attachment:',
+
+
 
 
 
@@ -427,23 +435,53 @@ function myFunc() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+               'select' : 'اختر اللغة',
+             'to' : 'إلى:',
+            'sub': 'الموضوع:',
+             'msg': 'الرسالة:',
+            'attach': 'المرفق:',
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-            });
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 

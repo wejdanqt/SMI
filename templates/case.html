@@ -126,7 +126,7 @@
           <!-- Control Sidebar Toggle Button -->
   <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select">Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -296,18 +296,18 @@ function myFunc() {
          <hr>
           <!-- /.box-header -->
           <div class="box-body">
-            <strong>Case Number</strong>
+            <strong class="lang" key="case_num">Case Number</strong>
 
             <p class="text-muted">
             #{{ data[0][0] }}
             </p>
-               <strong>Date of the case</strong>
+               <strong class="lang" key="case_date">Date of the case</strong>
 
             <p class="text-muted">
             {{ data[0][2] }}
             </p>
             <hr>
-              <strong style="font-size:130%" >Suspicious Transactions</strong>
+              <strong style="font-size:130%" class="lang" key="sus_tran">Suspicious Transactions</strong>
 
 
             <div class="box-body table-responsive no-padding">
@@ -315,12 +315,12 @@ function myFunc() {
               <table class="table table-hover">
 
                 <tr>
-                  <th>Transaction Number </th>
-                  <th>Transaction Type</th>
-                  <th>Transaction Amount</th>
-                    <th>Location of Transaction </th>
-                  <th>Old Balance</th>
-                  <th>New Balance</th>
+                  <th class="lang" key="tran_num">Transaction Number </th>
+                  <th class="lang" key="tran_type">Transaction Type</th>
+                  <th class="lang" key="tran_amount" >Transaction Amount</th>
+                    <th class="lang" key="tran_loc">Location of Transaction</th>
+                  <th class="lang" key="tran_old_b">Old Balance</th>
+                  <th class="lang" key="tran_new_b">New Balance</th>
 
 
 
@@ -349,7 +349,7 @@ function myFunc() {
               </div>
 
 
-          <strong style="font-size:130%">Business Rules Violation</strong>
+          <strong style="font-size:130%" class="lang" key="bus_v">Business Rules Violation</strong>
 
 
             <div class="box-body table-responsive no-padding">
@@ -361,8 +361,8 @@ function myFunc() {
               <table class="table table-hover">
 
                 <tr>
-                  <th>Rule Number </th>
-                  <th>Rule Statement </th>
+                  <th class="lang" key="rule_num">Rule Number </th>
+                  <th class="lang" key="rule_s">Rule Statement </th>
                 </tr>
                    {% for keys, values in Br_dic.items() %}
                 <tr>
@@ -381,7 +381,7 @@ function myFunc() {
 
               <!-- Custom bussinse rule violation -->
               {% if Custom_BR_flag%}
-               <strong style="font-size:130%">Custom Business Rules Violation</strong>
+               <strong style="font-size:130%" class="lang" key="c_b_v">Custom Business Rules Violation</strong>
 
 
             <div class="box-body table-responsive no-padding">
@@ -394,7 +394,7 @@ function myFunc() {
               <table class="table table-hover">
 
                 <tr>
-                  <th>Rules </th>
+                  <th class="lang" key="c_r"> Rules </th>
 
                 </tr>
                    {% for each in Custom_BR %}
@@ -416,9 +416,9 @@ function myFunc() {
               <div class="box-footer">
               <div style="margin-left:38%;">
 
-                  <a href= '/Report/{{caseId}} ' class="btn btn-default" > Send Report</a>
+                  <a href= '/Report/{{caseId}} ' class="btn btn-default lang" key="report" > Send Report</a>
                   &nbsp; &nbsp;
-                  <a href= '/clientProfile/{{clientId}} ' class="btn btn-default" > View Client Profile</a>
+                  <a href= '/clientProfile/{{clientId}} ' class="btn btn-default lang" key="client_p"> View Client Profile</a>
 
 
                </div>
@@ -463,7 +463,27 @@ function myFunc() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'select' : 'Select language',
+            'case_num' : 'Case Number',
+            'case_date' : 'Date of the case',
+            'sus_tran' : 'Suspicious Transactions',
+            'tran_num' : 'Transaction Number ',
+            'tran_type' : 'Transaction Type',
+            'tran_amount' : 'Transaction Amount',
+            'tran_loc' : 'Location of Transaction',
+            'tran_old_b' : 'Old Balance',
+            'tran_new_b' : 'New Balance',
+             'bus_v' : 'Business Rules Violation',
+             'rule_num' : 'Rule Number',
+            'rule_s' : 'Rule Statement',
+            'c_b_v' : 'Custom Business Rules Violation',
+             'c_r' : 'Rules',
+             'report' : 'Send Report',
+            'client_p' : 'View Client Profile',
+
+
+
 
 
 
@@ -479,23 +499,65 @@ function myFunc() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+            'select' : 'اختر اللغة',
+             'case_num' : 'رقم القضية',
+            'case_date' : 'تاريخ صدور القضية',
+            'sus_tran' : 'الحوالات المالية المشبوهة',
+            'tran_num' : 'رقم الحوالة',
+            'tran_type' : 'نوع الحوالة',
+            'tran_amount' : 'قيمة الحوالة',
+            'tran_loc' : 'موقع الحوالة',
+            'tran_old_b' : 'الرصيد القديم',
+            'tran_new_b' : 'الرصيد الجديد',
+            'bus_v' : 'إنتهاكات قواعد العمل',
+            'rule_num' : 'رقم القاعدة',
+             'rule_s' : 'بيان القاعدة',
+             'c_b_v' : 'انتهاكات قواعد العمل المخصصة',
+              'c_r' : 'القاعدة',
+            'report' : 'إرسال تقرير',
+            'client_p' : 'الملف الشخصي للعميل',
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-            });
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 

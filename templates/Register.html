@@ -94,17 +94,17 @@
 
 
               <li>
-              <a href="{{ url_for('home') }}">Home</a>
+              <a class="lang" key="home" href="{{ url_for('home') }}">Home</a>
           </li>
 
 
           <li>
-              <a href="{{ url_for('login') }}">Login</a>
+              <a class="lang" key="login" href="{{ url_for('login') }}">Login</a>
           </li>
 
                 <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span  class="lang" key="select">Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -153,7 +153,8 @@
     <form action="" method="post">
     {{ form.hidden_tag() }}
       <div class="form-group has-feedback">
-         {{ form.fullName.label(class="form-control-label") }}
+      <label class="form-control-label lang" key="full_name"> </label>
+
                     {% if form.fullName.errors %}
                         {{ form.fullName(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -169,7 +170,8 @@
 
     <!-- drop down list here-->
       <div class="form-group has-feedback">
-          {{ form.username.label(class="form-control-label") }}
+      <label class="form-control-label lang" key="user">Username</label>
+
 
                     {% if form.username.errors %}
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
@@ -186,7 +188,7 @@
       </div>
 
     <div class="form-group has-feedback">
-          {{ form.bankName.label(class="form-control-label") }}
+                <label class="form-control-label lang" key="bank_name">Bank Name</label>
 
                     {% if form.bankName.errors %}
                         {{ form.bankName(class="form-control form-control-lg is-invalid") }}
@@ -204,7 +206,8 @@
 
 
       <div class="form-group has-feedback">
-          {{ form.email.label(class="form-control-label") }}
+      <label class="form-control-label lang" key="email">Email</label>
+
                     {% if form.email.errors %}
                         {{ form.email(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -221,7 +224,7 @@
       </div>
 
       <div class="form-group has-feedback">
-         {{ form.password.label(class="form-control-label") }}
+           <label class="form-control-label lang" key="pass">Password</label>
                     {% if form.password.errors %}
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -235,7 +238,7 @@
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-          {{ form.confirm_password.label(class="form-control-label") }}
+                   <label class="form-control-label lang" key="c_pass">Confirm Password</label>
                     {% if form.confirm_password.errors %}
                         {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -279,7 +282,86 @@
 <!-- ./wrapper -->
 
 <!-- jQuery 3 -->
+  <!-- Transelate code -->
 
+
+<script>
+
+    var arrLang ={
+
+        'en' : {
+            'home': 'Home',
+            'select' : 'Select language',
+               'login' : 'Login',
+             'email' : 'Email',
+             'user' : 'Username',
+            'full_name' : 'Full Name ',
+             'pass' : 'Password',
+             'c_pass' : 'Confirm Password',
+             'bank_name' : 'Bank Name',
+
+
+
+
+
+
+
+        },
+        'ar' : {
+              'home': 'الصفحة الرئيسية',
+              'select' : 'اختر اللغة',
+             'login' : 'تسجيل الدخول',
+            'email' : 'البريد الإلكتروني',
+              'user' : 'إسم المستخدم ( username )',
+            'full_name' : 'الإسم الكامل',
+            'pass' : 'كلمة المرور',
+            'c_pass' : 'تأكيد كلمة المرور',
+               'bank_name' : 'إسم البنك',
+
+
+
+        }
+    };
+
+
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
+
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
+
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
+
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
+
+</script>
 
 <script>
     location.href = Flask.url_for('bower_components/jquery/dist/jquery.min.js', {});

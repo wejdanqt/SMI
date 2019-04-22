@@ -152,7 +152,7 @@
                 <!-- Control Sidebar Toggle Button -->
                <li class="dropdown notifications-menu">
                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>Select language</span>
+                    <span class="lang" key="select" >Select language</span>
                   </a>
                   <ul class="dropdown-menu">
 
@@ -311,13 +311,14 @@ function myFunc() {
 
           <ul class="list-group list-group-unbordered">
             <li class="list-group-item">
-              <b>{{ clientForm.clientID.label() }}</b> <p >{{clientForm.clientID.data}}</p>
+              <b class="lang" key="client_id"><label>Client ID</label></b> <p >{{clientForm.clientID.data}}</p>
 
 
             </li>
 
                <li class="list-group-item">
-              <b>{{ clientForm.avg.label() }}</b> <p>{{clientForm.avg.data}}</p>
+                <b class="lang" key="avg_tran"><label>Average amount of transactions</label></b> <p>{{clientForm.avg.data}}</p>
+
 
 
             </li>
@@ -335,10 +336,10 @@ function myFunc() {
 
                      {% for comment in record %}
           <li class="list-group-item">
-              <b>{{oldCommentForm.PrecommentContent.label()}}</b> <p>{{ comment[1] }}</p>
-              <b>{{oldCommentForm.PrecommentDate.label()}}</b>
+              <b class="lang" key="comment">Comment</b> <p>{{ comment[1] }}</p>
+              <b class="lang" key="date">Date</b>
               <p>{{ comment[2] }}</p>
-              <b>AML Officer name</b> <p>{{ comment[4] }}</p>
+              <b class="lang" key="aml_name">AML Officer name</b> <p>{{ comment[4] }}</p>
 
 
                <button type="submit"  class="btn btn-default " name="Delete_comment" value="{{ comment[0] }}">Delete</button>
@@ -425,7 +426,14 @@ function myFunc() {
             'data': 'Database Setup',
             'bus': 'Business Rules Setup',
             'profile': 'Profile',
-            'keyword': 'Keywords Setup'
+            'keyword': 'Keywords Setup',
+            'select' : 'Select language',
+            'client_id' : 'Client ID',
+            'avg_tran' :'Average amount of transactions',
+            'comment' : 'Comment',
+             'date' : 'Date',
+             'aml_name' : 'AML Officer name',
+
 
 
 
@@ -441,23 +449,55 @@ function myFunc() {
             'data': 'إعدادات قاعدة البيانات',
             'bus': 'إعدادات اللوائح',
             'profile': 'الملف الشخصي',
-            'keyword': 'إعدادات كلمات البحث'
+            'keyword': 'إعدادات كلمات البحث',
+              'select' : 'اختر اللغة',
+            'client_id' : 'رقم العميل',
+           'avg_tran' : 'متوسط الحوالات المالية',
+            'comment' : 'التعليق',
+             'date' : 'التاريخ',
+             'aml_name' : 'ضابط مكافحة غسل الاموال',
+
 
         }
     };
 
-    $(function () {
-        $('.translate').click(function () {
-            var lang = $(this).attr('id');
-            $('.lang').each(function (index , element) {
 
-                $(this).text(arrLang[lang][$(this).attr('key')]);
+    // The default language is English
+var lang = "en";
+// Check for localStorage support
+if('localStorage' in window){
 
-            });
+   var usrLang = localStorage.getItem('uiLang');
+   if(usrLang) {
+       lang = usrLang
+   }
 
+}
+
+
+console.log(lang);
+
+        $(document).ready(function() {
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
         });
 
-    });
+        // get/set the selected language
+        $(".translate").click(function() {
+          var lang = $(this).attr("id");
+
+          // update localStorage key
+          if('localStorage' in window){
+               localStorage.setItem('uiLang', lang);
+               console.log( localStorage.getItem('uiLang') );
+          }
+
+          $(".lang").each(function(index, element) {
+            $(this).text(arrLang[lang][$(this).attr("key")]);
+          });
+        });
 
 </script>
 
